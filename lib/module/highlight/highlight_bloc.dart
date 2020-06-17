@@ -1,7 +1,9 @@
 import 'package:comicappflutter/base/base_bloc.dart';
 import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/repo/highlight_repo.dart';
+import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:flutter/widgets.dart';
+import 'package:rxdart/rxdart.dart';
 
 class HighlightBloc extends BaseBloc with ChangeNotifier {
   HighlightRepo _highlightRepo;
@@ -21,6 +23,11 @@ class HighlightBloc extends BaseBloc with ChangeNotifier {
   @override
   void dispatchEvent(BaseEvent event) {
     print(event);
+  }
+
+  Stream<List<Comic>> getNominateComicList() {
+    return Stream<List<Comic>>.fromFuture(
+        _highlightRepo.getNominateComicList());
   }
 
   @override
