@@ -37,7 +37,7 @@ class _SplashPageState extends State<SplashPage> {
           ScaleAnimation(
             child: Center(
               child: Text(
-                'Comics Reader',
+                'Novel Galaxy',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.getFont(
                   'Pacifico',

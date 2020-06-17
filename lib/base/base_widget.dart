@@ -1,4 +1,5 @@
 import 'package:comicappflutter/shared/app_color.dart';
+import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -33,7 +34,7 @@ class PageContainer extends StatelessWidget {
           centerTitle: isCenterTitle,
           title: Text(
             title,
-            style: TextStyle(color: AppColor.green),
+            style: TvStyle.fontApp(),
           ),
           actions: actions,
         ),

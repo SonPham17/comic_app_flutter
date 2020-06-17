@@ -39,20 +39,22 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _navigationController =
-        new CircularBottomNavigationController(_currentIndex);
+    _navigationController = CircularBottomNavigationController(_currentIndex);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _children[_currentIndex],
+      body: IndexedStack(
+        children: _children,
+        index: _currentIndex,
+      ),
       bottomNavigationBar: CircularBottomNavigation(
         tabItems,
         controller: _navigationController,
         barHeight: bottomNavBarHeight,
+        selectedPos: _currentIndex,
         barBackgroundColor: Colors.white,
         animationDuration: Duration(milliseconds: 300),
         selectedCallback: (selectedPos) {
