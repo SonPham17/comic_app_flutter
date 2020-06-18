@@ -91,10 +91,22 @@ class ComicListWidget extends StatelessWidget {
               }
 
               var newUpdateList = data;
-              return Wrap(
-                direction: Axis.horizontal,
-                children:
-                    newUpdateList.map((item) => _buildItemGrid(item)).toList(),
+              return Container(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GridView.count(
+                    crossAxisCount: 3, // số lượng cột trong 1 hàng
+                    mainAxisSpacing: 8, // khoảng cách giữa các thằng con theo trục dọc
+                    crossAxisSpacing: 8, // khoảng cách giữa các cột theo trục ngang
+                    padding: EdgeInsets.all(8),
+                    childAspectRatio: 0.5,
+                    physics: ScrollPhysics(),
+                    shrinkWrap: true,
+                    children: newUpdateList
+                        .map((comic) => _buildItemGrid(comic))
+                        .toList(),
+                  ),
+                ),
               );
             }),
           ),
@@ -156,28 +168,29 @@ class ComicListWidget extends StatelessWidget {
   }
 
   Widget _buildItemGrid(Comic comic) {
-    return Container(
-      height: 180,
-      child: Card(
-        elevation: 3.0,
-        child: Container(
-          padding: EdgeInsets.all(7),
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Image.network(
-                    'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
-                    height: 50,
-                  ),
-                ),
-              ),
-              Text(comic.name),
-            ],
-          ),
+    Widget image = Material(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      clipBehavior: Clip.antiAlias,
+      child: Image.network(
+        'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
+        fit: BoxFit.cover,
+      ),
+    );
+
+    return GridTile(
+      footer: Material(
+        color: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: GridTileBar(
+          backgroundColor: Colors.black45,
+          title: Text(comic.name),
+          subtitle: Text(comic.author),
         ),
       ),
+      child: image,
     );
   }
 
