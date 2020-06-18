@@ -5,7 +5,7 @@ import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
 
-class HighlightBloc extends BaseBloc with ChangeNotifier {
+class HighlightBloc extends BaseBloc {
   HighlightRepo _highlightRepo;
 
   static HighlightBloc _instance;
@@ -28,6 +28,11 @@ class HighlightBloc extends BaseBloc with ChangeNotifier {
   Stream<List<Comic>> getNominateComicList() {
     return Stream<List<Comic>>.fromFuture(
         _highlightRepo.getNominateComicList());
+  }
+
+  Stream<List<Comic>> getNewUpdateComicList() {
+    return Stream<List<Comic>>.fromFuture(
+        _highlightRepo.getNewUpdateComicList());
   }
 
   @override

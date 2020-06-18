@@ -4,7 +4,9 @@ import 'package:comicappflutter/data/repo/highlight_repo.dart';
 import 'package:comicappflutter/module/highlight/highlight_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
+import 'package:comicappflutter/shared/model/rest_error.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -41,97 +43,187 @@ class HighlightPage extends StatelessWidget {
 class ComicListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: HighlightBloc.getInstance(
+    return Provider(
+      create: (_) => HighlightBloc.getInstance(
         highlightRepo: Provider.of(context),
       ),
       child: Consumer<HighlightBloc>(
-        builder: (context, bloc, child) => Container(
-          child: StreamProvider<Object>.value(
-            value: bloc.getNominateComicList(),
-            initialData: null,
-            child: Consumer<Object>(
-              builder: (_, data, child) {
-                if (data == null) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: AppColor.blue,
-                    ),
-                  );
-                }
+        builder: (context, bloc, child) => ListView(
+          children: <Widget>[
+            _buildNominateComic(bloc),
+            _buildNewUpdateComic(bloc),
+          ],
+        ),
+      ),
+    );
+  }
 
-                var nominateList = data as List<Comic>;
-                return Container(
-                  child: Column(
-                    children: <Widget>[
-                      CarouselSlider(
-                        options: CarouselOptions(
-                            autoPlay: true,
-                            aspectRatio: 2.0,
-                            enlargeCenterPage: true),
-                        items: imageSliders,
-                      )
-                    ],
+  _buildNewUpdateComic(HighlightBloc bloc) {
+    return Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              child: Text('Mới Cập Nhật', style: TvStyle.fontAppWithSize(18.0)),
+              margin: EdgeInsets.only(top: 5, left: 5),
+            ),
+            Container(
+              child: Text('Xem Thêm', style: TvStyle.fontAppWithSize(18.0)),
+              margin: EdgeInsets.only(right: 5),
+            ),
+          ],
+        ),
+        Container(
+          child: StreamProvider<List<Comic>>.value(
+            value: bloc.getNewUpdateComicList(),
+            initialData: null,
+            catchError: (context, error) {
+              return error;
+            },
+            child: Consumer<List<Comic>>(builder: (_, data, child) {
+              if (data == null) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: AppColor.blue,
                   ),
                 );
-              },
-            ),
+              }
+
+              var newUpdateList = data;
+              return Wrap(
+                direction: Axis.horizontal,
+                children:
+                    newUpdateList.map((item) => _buildItemGrid(item)).toList(),
+              );
+            }),
+          ),
+        )
+      ],
+    );
+  }
+
+  _buildNominateComic(HighlightBloc bloc) {
+    return Container(
+      child: StreamProvider<Object>.value(
+        value: bloc.getNominateComicList(),
+        initialData: null,
+        catchError: (context, error) {
+          return error;
+        },
+        child: Consumer<Object>(
+          builder: (_, data, child) {
+            if (data == null) {
+              return Container(
+                height: 170,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: AppColor.blue,
+                  ),
+                ),
+              );
+            }
+
+            if (data is RestError) {
+              return Center(
+                child: Container(
+                  child: Text(
+                    data.message,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+              );
+            }
+
+            var nominateList = data as List<Comic>;
+            return Container(
+              child: Column(
+                children: <Widget>[
+                  CarouselSlider(
+                    options: CarouselOptions(
+                        autoPlay: true,
+                        aspectRatio: 2.0,
+                        enlargeCenterPage: true),
+                    items: setupCarouseList(nominateList),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItemGrid(Comic comic) {
+    return Container(
+      height: 180,
+      child: Card(
+        elevation: 3.0,
+        child: Container(
+          padding: EdgeInsets.all(7),
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: Image.network(
+                    'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
+                    height: 50,
+                  ),
+                ),
+              ),
+              Text(comic.name),
+            ],
           ),
         ),
       ),
     );
   }
 
-  _buildRow(HighlightBloc bloc, Comic comic) {}
+  List<Widget> setupCarouseList(List<Comic> comis) {
+    return comis
+        .map((item) => Container(
+              child: Container(
+                margin: EdgeInsets.all(5.0),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    child: Stack(
+                      children: <Widget>[
+                        Image.network(
+                            'https://www.nae.vn/ttv/ttv/public/images/story/${item.image}.jpg',
+                            fit: BoxFit.cover,
+                            width: 1000.0),
+                        Positioned(
+                          bottom: 0.0,
+                          left: 0.0,
+                          right: 0.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color.fromARGB(200, 0, 0, 0),
+                                  Color.fromARGB(0, 0, 0, 0)
+                                ],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                              ),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 20.0),
+                            child: Text(
+                              item.name,
+                              style: TvStyle.fontAppWithCustom(
+                                  color: Colors.white,
+                                  size: 17.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+              ),
+            ))
+        .toList();
+  }
 }
-
-final List<String> imgList = [
-  'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
-  'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-  'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
-  'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-  'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
-];
-
-final List<Widget> imageSliders = imgList
-    .map((item) => Container(
-          child: Container(
-            margin: EdgeInsets.all(5.0),
-            child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                child: Stack(
-                  children: <Widget>[
-                    Image.network(item, fit: BoxFit.cover, width: 1000.0),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(200, 0, 0, 0),
-                              Color.fromARGB(0, 0, 0, 0)
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 20.0),
-                        child: Text(
-                          'No. ${imgList.indexOf(item)} image',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-          ),
-        ))
-    .toList();

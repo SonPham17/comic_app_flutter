@@ -6,4 +6,9 @@ class HighlightService {
     return ComicClient.instance.dio
         .get('/hello_novel/public/api/stories/nominate');
   }
+
+  Future<Response> getNewUpdateComicList() {
+    return ComicClient.instance.dio
+        .get('/hello_novel/public/api/stories/time_fix');
+  }
 }
