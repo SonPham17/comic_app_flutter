@@ -12,6 +12,7 @@ class PageContainer extends StatelessWidget {
   final List<SingleChildWidget> bloc;
   final List<SingleChildWidget> di;
   final List<Widget> actions;
+  final Widget leading;
 
   PageContainer({
     this.title,
@@ -20,6 +21,7 @@ class PageContainer extends StatelessWidget {
     this.di,
     this.actions,
     this.isCenterTitle,
+    this.leading,
   });
 
   @override
@@ -31,6 +33,7 @@ class PageContainer extends StatelessWidget {
       ],
       child: Scaffold(
         appBar: AppBar(
+          leading: leading,
           centerTitle: isCenterTitle,
           title: Text(
             title,

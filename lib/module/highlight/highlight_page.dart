@@ -15,6 +15,12 @@ class HighlightPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageContainer(
+      leading: IconButton(
+        icon: Icon(Icons.free_breakfast),
+        onPressed: () {
+          print('leading');
+        },
+      ),
       title: 'Novel Galaxy',
       actions: <Widget>[
         IconButton(
@@ -35,12 +41,12 @@ class HighlightPage extends StatelessWidget {
         ),
       ],
       bloc: [],
-      child: ComicListWidget(),
+      child: HighlightListWidget(),
     );
   }
 }
 
-class ComicListWidget extends StatelessWidget {
+class HighlightListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
@@ -51,74 +57,118 @@ class ComicListWidget extends StatelessWidget {
         builder: (context, bloc, child) => ListView(
           children: <Widget>[
             _buildNominateComic(bloc),
+            _buildTopViewComic(bloc),
             _buildNewUpdateComic(bloc),
+            _buildNewCreatedComic(bloc),
+            _buildFinishedComic(bloc),
           ],
         ),
       ),
     );
   }
 
-  _buildNewUpdateComic(HighlightBloc bloc) {
+  Widget _buildTopViewComic(HighlightBloc bloc) {
+    bloc.getTopViewComicList();
+    return _baseBuildWidgetComic(
+        stream: bloc.topViewComicStream, title: 'Xem Nhiều Trong Tháng');
+  }
+
+  Widget _buildFinishedComic(HighlightBloc bloc) {
+    bloc.getFinishedComicList();
+    return _baseBuildWidgetComic(
+        stream: bloc.finishedComicStream, title: 'Đã Hoàn Thành');
+  }
+
+  Widget _buildNewCreatedComic(HighlightBloc bloc) {
+    bloc.getNewCreatedComicList();
+    return _baseBuildWidgetComic(
+        stream: bloc.newCreatedComicStream, title: 'Mới Tạo');
+  }
+
+  Widget _baseBuildWidgetComic({Stream<List<Comic>> stream, String title}) {
     return Column(
       children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Container(
-              child: Text('Mới Cập Nhật', style: TvStyle.fontAppWithSize(18.0)),
+              child: Text(title,
+                  style: TvStyle.fontAppWithCustom(
+                      size: 20.0,
+                      color: AppColor.green,
+                      fontWeight: FontWeight.bold)),
               margin: EdgeInsets.only(top: 5, left: 5),
             ),
             Container(
-              child: Text('Xem Thêm', style: TvStyle.fontAppWithSize(18.0)),
+              child: Text('Xem Thêm',
+                  style: TvStyle.fontAppWithCustom(
+                      size: 18.0,
+                      color: AppColor.green,
+                      textDecoration: TextDecoration.underline)),
               margin: EdgeInsets.only(right: 5),
             ),
           ],
         ),
         Container(
           child: StreamProvider<List<Comic>>.value(
-            value: bloc.getNewUpdateComicList(),
+            value: stream,
             initialData: null,
             catchError: (context, error) {
               return error;
             },
-            child: Consumer<List<Comic>>(builder: (_, data, child) {
-              if (data == null) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: AppColor.blue,
+            child: Consumer<List<Comic>>(
+              builder: (_, data, child) {
+                if (data == null) {
+                  return Container(
+                    height: 170,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: AppColor.blue,
+                      ),
+                    ),
+                  );
+                }
+
+                var newUpdateList = data;
+                return Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    child: GridView.count(
+                      crossAxisCount: 3,
+                      // số lượng cột trong 1 hàng
+                      mainAxisSpacing: 5,
+                      // khoảng cách giữa các thằng con theo trục dọc
+                      crossAxisSpacing: 5,
+                      // khoảng cách giữa các cột theo trục ngang
+                      padding: EdgeInsets.all(5),
+                      childAspectRatio: 0.5,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      children: newUpdateList
+                          .map((comic) => _buildItemGrid(comic))
+                          .toList(),
+                    ),
                   ),
                 );
-              }
-
-              var newUpdateList = data;
-              return Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView.count(
-                    crossAxisCount: 3, // số lượng cột trong 1 hàng
-                    mainAxisSpacing: 8, // khoảng cách giữa các thằng con theo trục dọc
-                    crossAxisSpacing: 8, // khoảng cách giữa các cột theo trục ngang
-                    padding: EdgeInsets.all(8),
-                    childAspectRatio: 0.5,
-                    physics: ScrollPhysics(),
-                    shrinkWrap: true,
-                    children: newUpdateList
-                        .map((comic) => _buildItemGrid(comic))
-                        .toList(),
-                  ),
-                ),
-              );
-            }),
+              },
+            ),
           ),
         )
       ],
     );
   }
 
-  _buildNominateComic(HighlightBloc bloc) {
+  Widget _buildNewUpdateComic(HighlightBloc bloc) {
+    bloc.getNewUpdateComicList();
+    return _baseBuildWidgetComic(
+        stream: bloc.newUpdateComicStream, title: 'Mới Cập Nhật');
+  }
+
+  Widget _buildNominateComic(HighlightBloc bloc) {
+    bloc.getNominateComicList();
     return Container(
       child: StreamProvider<Object>.value(
-        value: bloc.getNominateComicList(),
+        value: bloc.nominateComicStream,
         initialData: null,
         catchError: (context, error) {
           return error;
@@ -168,29 +218,31 @@ class ComicListWidget extends StatelessWidget {
   }
 
   Widget _buildItemGrid(Comic comic) {
-    Widget image = Material(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      clipBehavior: Clip.antiAlias,
-      child: Image.network(
-        'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
-        fit: BoxFit.cover,
+    return Container(
+      child: Column(
+        children: <Widget>[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+                'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
+                height: 180,
+                fit: BoxFit.cover),
+          ),
+          SizedBox(
+            height: 3,
+          ),
+          Expanded(
+            child: Center(
+                child: Text(
+              comic.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TvStyle.fontAppWithSize(12),
+              textAlign: TextAlign.center,
+            )),
+          )
+        ],
       ),
-    );
-
-    return GridTile(
-      footer: Material(
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: GridTileBar(
-          backgroundColor: Colors.black45,
-          title: Text(comic.name),
-          subtitle: Text(comic.author),
-        ),
-      ),
-      child: image,
     );
   }
 

@@ -11,4 +11,19 @@ class HighlightService {
     return ComicClient.instance.dio
         .get('/hello_novel/public/api/stories/time_fix');
   }
+
+  Future<Response> getNewCreatedComicList() {
+    return ComicClient.instance.dio
+        .get('/hello_novel/public/api/stories/new_create');
+  }
+
+  Future<Response> getFinishedComicList() {
+    return ComicClient.instance.dio
+        .get('/hello_novel/public/api/stories/finish');
+  }
+
+  Future<Response> getTopViewComicList() {
+    return ComicClient.instance.dio
+        .get('/hello_novel/public/api/stories/top_month');
+  }
 }

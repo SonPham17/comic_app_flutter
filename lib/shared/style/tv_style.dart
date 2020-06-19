@@ -8,11 +8,12 @@ class TvStyle {
       GoogleFonts.getFont('Pacifico', fontSize: size);
 
   static TextStyle fontAppWithCustom(
-          {double size, Color color, FontWeight fontWeight}) =>
+          {double size, Color color, FontWeight fontWeight,TextDecoration textDecoration}) =>
       GoogleFonts.getFont(
         'Pacifico',
         fontSize: size,
         color: color,
+        decoration: textDecoration,
         fontWeight: fontWeight,
       );
 }

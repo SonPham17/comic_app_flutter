@@ -40,4 +40,49 @@ class HighlightRepo {
 
     return c.future;
   }
+
+  Future<List<Comic>> getNewCreatedComicList() async {
+    var c = Completer<List<Comic>>();
+    try {
+      var response = await _highlightService.getNewCreatedComicList();
+      var nominateList = Comic.parseComicList(response.data);
+      c.complete(nominateList);
+    } on DioError {
+      c.completeError(RestError.fromData('Không có dữ liệu'));
+    } catch (e) {
+      c.completeError(e);
+    }
+
+    return c.future;
+  }
+
+  Future<List<Comic>> getFinishedComicList() async {
+    var c = Completer<List<Comic>>();
+    try {
+      var response = await _highlightService.getFinishedComicList();
+      var nominateList = Comic.parseComicList(response.data);
+      c.complete(nominateList);
+    } on DioError {
+      c.completeError(RestError.fromData('Không có dữ liệu'));
+    } catch (e) {
+      c.completeError(e);
+    }
+
+    return c.future;
+  }
+
+  Future<List<Comic>> getTopViewComicList() async {
+    var c = Completer<List<Comic>>();
+    try {
+      var response = await _highlightService.getTopViewComicList();
+      var nominateList = Comic.parseComicList(response.data);
+      c.complete(nominateList);
+    } on DioError {
+      c.completeError(RestError.fromData('Không có dữ liệu'));
+    } catch (e) {
+      c.completeError(e);
+    }
+
+    return c.future;
+  }
 }
