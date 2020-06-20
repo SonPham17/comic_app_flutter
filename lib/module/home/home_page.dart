@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: CircularBottomNavigation(
         tabItems,
         controller: _navigationController,
-        barHeight: bottomNavBarHeight,
+        barHeight: 60,
         selectedPos: _currentIndex,
         barBackgroundColor: Colors.white,
         animationDuration: Duration(milliseconds: 300),

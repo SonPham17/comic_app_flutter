@@ -40,7 +40,7 @@ class _SplashPageState extends State<SplashPage> {
                 'Novel Galaxy',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.getFont(
-                  'Pacifico',
+                  'Sriracha',
                   fontSize: 45,
                   fontWeight: FontWeight.w500,
                   color: Colors.black,

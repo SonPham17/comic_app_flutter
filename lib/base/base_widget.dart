@@ -13,7 +13,6 @@ class PageContainer extends StatelessWidget {
   final List<SingleChildWidget> di;
   final List<Widget> actions;
   final Widget leading;
-  final PreferredSizeWidget tabBar;
 
   PageContainer({
     this.title,
@@ -23,7 +22,6 @@ class PageContainer extends StatelessWidget {
     this.actions,
     this.isCenterTitle,
     this.leading,
-    this.tabBar
   });
 
   @override
@@ -36,7 +34,6 @@ class PageContainer extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           leading: leading,
-          bottom: tabBar,
           centerTitle: isCenterTitle,
           title: Text(
             title,

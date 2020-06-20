@@ -4,39 +4,53 @@ import 'package:comicappflutter/data/repo/bookcase_repo.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tabbar/tabbar.dart';
 
 class BookcasePage extends StatelessWidget {
+  final controller = PageController();
+
   @override
   Widget build(BuildContext context) {
-    return PageContainer(
-      title: 'Tủ Sách',
-      isCenterTitle: true,
-      tabBar: TabBar(
-        isScrollable: true,
-        tabs: listTab
-            .map((item) => Tab(
-                  text: item.title,
-                  icon: Icon(item.iconData),
-                ))
-            .toList(),
-      ),
-      di: [
-        Provider.value(
-          value: BookcaseService(),
-        ),
+    return MultiProvider(
+      providers: [
+        Provider.value(value: BookcaseService()),
         ProxyProvider<BookcaseService, BookcaseRepo>(
           update: (context, bookcaseService, _) =>
               BookcaseRepo(bookcaseService: bookcaseService),
         ),
       ],
-      bloc: [],
-      child: TabBarView(
-        children: listTab
-            .map((item) => Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text(item.title),
-                ))
-            .toList(),
+      child: DefaultTabController(
+        length: listTab.length,
+        initialIndex: 0,
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: TabBar(
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.black,
+              indicatorColor: Colors.white,
+              labelStyle: TvStyle.fontAppWithCustom(size: 10),
+              tabs: listTab
+                  .map((item) => Tab(
+                        text: item.title,
+                        icon: Icon(item.iconData),
+                      ))
+                  .toList(),
+            ),
+            centerTitle: true,
+            title: Text(
+              'Tủ Sách',
+              style: TvStyle.fontApp(),
+            ),
+          ),
+          body: TabBarView(
+            children: listTab
+                .map((item) => Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Center(child: Text(item.title)),
+                    ))
+                .toList(),
+          ),
+        ),
       ),
     );
   }

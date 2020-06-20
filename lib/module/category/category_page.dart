@@ -89,15 +89,21 @@ class CategoryListWidget extends StatelessWidget {
   Widget _buildItemGrid(Category category) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        color: AppColor.green
+          borderRadius: BorderRadius.circular(10), color: AppColor.green),
+      child: FlatButton(
+        onPressed: () {
+          print('');
+        },
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Center(
+            child: Text(
+          category.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TvStyle.fontAppWithCustom(size: 13),
+          textAlign: TextAlign.center,
+        )),
       ),
-      child: Center(
-          child: Text(
-        category.name,
-        style: TvStyle.fontAppWithCustom(size: 15),
-        textAlign: TextAlign.center,
-      )),
     );
   }
 }
