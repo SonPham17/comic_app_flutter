@@ -5,6 +5,7 @@ import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:provider/provider.dart';
 
 class ExtensionPage extends StatelessWidget {
@@ -32,69 +33,89 @@ class ExtensionListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Stack(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+            begin: FractionalOffset.topCenter,
+            end: FractionalOffset.bottomCenter,
+            colors: [
+              AppColor.green,
+              Colors.green,
+            ]),
+      ),
+      child: ListView(
         children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: FractionalOffset.topCenter,
-                    end: FractionalOffset.bottomCenter,
-                    colors: [
-                  AppColor.green,
-                  Colors.green,
-                ])),
-          ),
-          Column(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(top: 30),
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white60, width: 2.0),
-                    ),
-                    padding: EdgeInsets.all(6.0),
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        'https://bloganchoi.com/wp-content/uploads/2017/03/naruto-uzumaki.jpg',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Text('Pham Trung Son',
-                  style: TvStyle.fontAppWithCustom(
-                      size: 20, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            margin: EdgeInsets.only(top: 280),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GridView.builder(
-                itemCount: 8,
-                gridDelegate:
-                    SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-                itemBuilder: (context,index)=>Card(
-                  child: Container(
-                    color: Colors.green,
-                    margin: EdgeInsets.all(4.0),
+              Container(
+                margin: EdgeInsets.only(top: 50),
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white60, width: 2.0),
+                ),
+                padding: EdgeInsets.all(6.0),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    'https://bloganchoi.com/wp-content/uploads/2017/03/naruto-uzumaki.jpg',
                   ),
                 ),
               ),
+            ],
+          ),
+          Text(
+            'Pham Trung Son',
+            textAlign: TextAlign.center,
+            style: TvStyle.fontAppWithCustom(
+                size: 24, fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: ListView(
+              children: <Widget>[],
             ),
           )
+        ],
+      ),
+    );
+  }
+}
+
+class ExtensionListItem extends StatelessWidget {
+  final IconData iconData;
+  final String text;
+  final bool hasNavigation;
+
+  ExtensionListItem({this.iconData, this.text, this.hasNavigation = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      margin: EdgeInsets.symmetric(
+        horizontal: 5,
+      ).copyWith(bottom: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(3),
+        color: Theme.of(context).backgroundColor,
+      ),
+      child: Row(
+        children: <Widget>[
+          Icon(
+            this.iconData,
+            size: 10,
+          ),
+          SizedBox(width: 5),
+          Text(
+            this.text,
+            style: TvStyle.fontAppWithCustom(),
+          ),
+          Spacer(),
+
+          Icon(
+            LineAwesomeIcons.angle_right,
+            size: 10,
+          ),
         ],
       ),
     );
