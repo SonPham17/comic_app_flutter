@@ -49,18 +49,22 @@ class ExtensionListWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(top: 30),
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white60, width: 2.0),
-                ),
-                padding: EdgeInsets.all(6.0),
-                child: CircleAvatar(
-                  backgroundImage: ,
-                ),
-              ),
+                  margin: EdgeInsets.only(top: 30),
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white60, width: 2.0),
+                  ),
+                  padding: EdgeInsets.all(6.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.asset(
+                      'assets/images/main_icon.png',
+                      height: 120,
+                      width: 120,
+                    ),
+                  )),
             ],
           ),
           Text(
