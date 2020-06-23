@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:flutter/material.dart';
 import 'module/splash/splash.dart';
@@ -12,6 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      builder: BotToastInit(),
+      navigatorObservers: [BotToastNavigatorObserver()],
       title: 'Comics Reader',
       theme: ThemeData(
         primarySwatch: AppColor.green,

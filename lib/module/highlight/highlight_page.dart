@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/highlight_service.dart';
 import 'package:comicappflutter/data/repo/highlight_repo.dart';
@@ -46,43 +47,31 @@ class HighlightPage extends StatelessWidget {
   }
 }
 
-class HighlightListWidget extends StatelessWidget {
+class ItemComicListPage extends StatefulWidget {
+  final String _title;
+  final Function _loadApi;
+  final Stream<List<Comic>> _stream;
+
+  ItemComicListPage(
+      {@required String title, Function loadApi, Stream<List<Comic>> stream})
+      : _title = title,
+        _stream = stream,
+        _loadApi = loadApi;
+
+  @override
+  _ItemComicListPageState createState() => _ItemComicListPageState();
+}
+
+class _ItemComicListPageState extends State<ItemComicListPage> {
+  @override
+  void initState() {
+    super.initState();
+    widget._loadApi();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      create: (_) => HighlightBloc.getInstance(
-        highlightRepo: Provider.of(context),
-      ),
-      child: Consumer<HighlightBloc>(
-        builder: (context, bloc, child) => ListView(
-          children: <Widget>[
-            _buildNominateComic(bloc),
-            _buildTopViewComic(bloc),
-            _buildNewUpdateComic(bloc),
-            _buildNewCreatedComic(bloc),
-            _buildFinishedComic(bloc),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTopViewComic(HighlightBloc bloc) {
-    bloc.getTopViewComicList();
-    return _baseBuildWidgetComic(
-        stream: bloc.topViewComicStream, title: 'Xem Nhiều Trong Tháng');
-  }
-
-  Widget _buildFinishedComic(HighlightBloc bloc) {
-    bloc.getFinishedComicList();
-    return _baseBuildWidgetComic(
-        stream: bloc.finishedComicStream, title: 'Đã Hoàn Thành');
-  }
-
-  Widget _buildNewCreatedComic(HighlightBloc bloc) {
-    bloc.getNewCreatedComicList();
-    return _baseBuildWidgetComic(
-        stream: bloc.newCreatedComicStream, title: 'Mới Tạo');
+    return _baseBuildWidgetComic(stream: widget._stream, title: widget._title);
   }
 
   Widget _baseBuildWidgetComic({Stream<List<Comic>> stream, String title}) {
@@ -129,6 +118,10 @@ class HighlightListWidget extends StatelessWidget {
                   );
                 }
 
+                if (data is RestError) {
+                  BotToast.showText(text: 'Không thể tải mới dữ liệu');
+                }
+
                 var newUpdateList = data;
                 return Container(
                   child: Padding(
@@ -158,10 +151,73 @@ class HighlightListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildNewUpdateComic(HighlightBloc bloc) {
-    bloc.getNewUpdateComicList();
-    return _baseBuildWidgetComic(
-        stream: bloc.newUpdateComicStream, title: 'Mới Cập Nhật');
+  Widget _buildItemGrid(Comic comic) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+                'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
+                height: 180,
+                fit: BoxFit.cover),
+          ),
+          SizedBox(
+            height: 3,
+          ),
+          Expanded(
+            child: Center(
+                child: Text(
+              comic.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TvStyle.fontAppWithSize(12),
+              textAlign: TextAlign.center,
+            )),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class HighlightListWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Provider(
+      create: (_) => HighlightBloc.getInstance(
+        highlightRepo: Provider.of(context),
+      ),
+      child: Consumer<HighlightBloc>(
+        builder: (context, bloc, child) => SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              _buildNominateComic(bloc),
+              ItemComicListPage(
+                title: 'Xem Nhiều Trong Tháng',
+                stream: bloc.topViewComicStream,
+                loadApi: bloc.getTopViewComicList,
+              ),
+              ItemComicListPage(
+                title: 'Mới Cập Nhật',
+                stream: bloc.newUpdateComicStream,
+                loadApi: bloc.getNewUpdateComicList,
+              ),
+              ItemComicListPage(
+                title: 'Mới Tạo',
+                stream: bloc.newCreatedComicStream,
+                loadApi: bloc.getNewCreatedComicList,
+              ),
+              ItemComicListPage(
+                title: 'Đã Hoàn Thành',
+                stream: bloc.finishedComicStream,
+                loadApi: bloc.getFinishedComicList,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildNominateComic(HighlightBloc bloc) {
@@ -213,35 +269,6 @@ class HighlightListWidget extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildItemGrid(Comic comic) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-                'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
-                height: 180,
-                fit: BoxFit.cover),
-          ),
-          SizedBox(
-            height: 3,
-          ),
-          Expanded(
-            child: Center(
-                child: Text(
-              comic.name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TvStyle.fontAppWithSize(12),
-              textAlign: TextAlign.center,
-            )),
-          )
-        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +49,7 @@ class ExtensionListWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(top: 50),
+                margin: EdgeInsets.only(top: 30),
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
@@ -57,9 +58,7 @@ class ExtensionListWidget extends StatelessWidget {
                 ),
                 padding: EdgeInsets.all(6.0),
                 child: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    'https://bloganchoi.com/wp-content/uploads/2017/03/naruto-uzumaki.jpg',
-                  ),
+                  backgroundImage: ,
                 ),
               ),
             ],
@@ -70,9 +69,35 @@ class ExtensionListWidget extends StatelessWidget {
             style: TvStyle.fontAppWithCustom(
                 size: 24, fontWeight: FontWeight.bold),
           ),
+          SizedBox(
+            height: 25,
+          ),
           Expanded(
             child: ListView(
-              children: <Widget>[],
+              shrinkWrap: true,
+              physics: ClampingScrollPhysics(),
+              children: <Widget>[
+                ExtensionListItem(
+                  iconData: LineAwesomeIcons.globe,
+                  text: 'Chọn nguồn truyện',
+                ),
+                ExtensionListItem(
+                  iconData: LineAwesomeIcons.star,
+                  text: 'Đánh giá ứng dụng',
+                ),
+                ExtensionListItem(
+                  iconData: LineAwesomeIcons.share_alt,
+                  text: 'Chia sẻ với bạn bè',
+                ),
+                ExtensionListItem(
+                  iconData: LineAwesomeIcons.comment,
+                  text: 'Phản hồi góp ý',
+                ),
+                ExtensionListItem(
+                  iconData: LineAwesomeIcons.user,
+                  text: 'Đăng nhập',
+                ),
+              ],
             ),
           )
         ],
@@ -91,32 +116,37 @@ class ExtensionListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
+      height: 55,
       margin: EdgeInsets.symmetric(
-        horizontal: 5,
-      ).copyWith(bottom: 2),
+        horizontal: 6,
+      ).copyWith(bottom: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(3),
+        borderRadius: BorderRadius.circular(30),
         color: Theme.of(context).backgroundColor,
       ),
-      child: Row(
-        children: <Widget>[
-          Icon(
-            this.iconData,
-            size: 10,
-          ),
-          SizedBox(width: 5),
-          Text(
-            this.text,
-            style: TvStyle.fontAppWithCustom(),
-          ),
-          Spacer(),
-
-          Icon(
-            LineAwesomeIcons.angle_right,
-            size: 10,
-          ),
-        ],
+      padding: EdgeInsets.symmetric(
+        horizontal: 15,
+      ),
+      child: FlatButton(
+        onPressed: () {},
+        child: Row(
+          children: <Widget>[
+            Icon(
+              this.iconData,
+              size: 28,
+            ),
+            SizedBox(width: 15),
+            Text(
+              this.text,
+              style: TvStyle.fontAppWithCustom(),
+            ),
+            Spacer(),
+            Icon(
+              LineAwesomeIcons.angle_right,
+              size: 28,
+            ),
+          ],
+        ),
       ),
     );
   }
