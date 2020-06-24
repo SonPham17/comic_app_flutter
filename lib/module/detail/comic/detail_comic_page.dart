@@ -78,6 +78,9 @@ class DetailHeaderComicWidget extends StatelessWidget {
               height: 190,
             ),
           ),
+          SizedBox(
+            width: 10,
+          ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
