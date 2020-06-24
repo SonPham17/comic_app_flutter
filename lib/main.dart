@@ -1,4 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:comicappflutter/module/detail/comic/detail_comic_page.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:flutter/material.dart';
 import 'module/splash/splash.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/': (context) => SplashPage(),
         '/home': (context) => HomePage(),
+        '/detail/comic_page': (context) => DetailComicPage(),
       },
     );
   }

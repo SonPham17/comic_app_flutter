@@ -7,8 +7,6 @@ import 'package:comicappflutter/module/highlight/highlight_page.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/material.dart';
-import 'package:comicappflutter/base/base_widget.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
   @override

@@ -66,6 +66,7 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
   @override
   void initState() {
     super.initState();
+    print('_loadApi');
     widget._loadApi();
   }
 
@@ -192,7 +193,7 @@ class HighlightListWidget extends StatelessWidget {
         builder: (context, bloc, child) => SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              _buildNominateComic(bloc),
+              _buildNominateComic(bloc,context),
               ItemComicListPage(
                 title: 'Xem Nhiều Trong Tháng',
                 stream: bloc.topViewComicStream,
@@ -220,7 +221,7 @@ class HighlightListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildNominateComic(HighlightBloc bloc) {
+  Widget _buildNominateComic(HighlightBloc bloc,BuildContext context) {
     bloc.getNominateComicList();
     return Container(
       child: StreamProvider<Object>.value(
@@ -259,10 +260,12 @@ class HighlightListWidget extends StatelessWidget {
                 children: <Widget>[
                   CarouselSlider(
                     options: CarouselOptions(
-                        autoPlay: true,
-                        aspectRatio: 2.0,
-                        enlargeCenterPage: true),
-                    items: setupCarouseList(nominateList),
+                      autoPlay: true,
+                      aspectRatio: 2.0,
+                      enlargeCenterPage: true,
+                      viewportFraction: 0.8,
+                    ),
+                    items: setupCarouseList(nominateList,context),
                   )
                 ],
               ),
@@ -273,11 +276,15 @@ class HighlightListWidget extends StatelessWidget {
     );
   }
 
-  List<Widget> setupCarouseList(List<Comic> comis) {
+  List<Widget> setupCarouseList(List<Comic> comis,BuildContext context) {
     return comis
         .map((item) => Container(
-              child: Container(
-                margin: EdgeInsets.all(5.0),
+              margin: EdgeInsets.all(5.0),
+              child: GestureDetector(
+                onTap: (){
+                  Navigator.pushNamed(context, '/detail/comic_page',
+                  arguments: item);
+                },
                 child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     child: Stack(
@@ -285,7 +292,7 @@ class HighlightListWidget extends StatelessWidget {
                         Image.network(
                             'https://www.nae.vn/ttv/ttv/public/images/story/${item.image}.jpg',
                             fit: BoxFit.cover,
-                            width: 1000.0),
+                            width: double.infinity),
                         Positioned(
                           bottom: 0.0,
                           left: 0.0,
