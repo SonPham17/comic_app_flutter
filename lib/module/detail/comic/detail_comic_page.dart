@@ -2,10 +2,12 @@ import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
 import 'package:comicappflutter/module/detail/comic/detail_comic_bloc.dart';
+import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:provider/provider.dart';
 
 class DetailComicPage extends StatelessWidget {
@@ -49,9 +51,63 @@ class DetailComicListWidget extends StatelessWidget {
               DetailHeaderComicWidget(
                 comic: comic,
               ),
+              DetailIntroComicWidget(
+                comic: comic,
+              ),
+              DetailFooterComicWidget(
+                comic: comic,
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class DetailIntroComicWidget extends StatelessWidget {
+  final Comic comic;
+
+  DetailIntroComicWidget({this.comic});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                LineAwesomeIcons.book,
+                color: AppColor.green,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text(
+                'Giới thiệu',
+                style: TvStyle.fontAppWithCustom(
+                    size: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.green),
+              ),
+              Spacer(),
+              Icon(
+                LineAwesomeIcons.heart_o,
+                color: AppColor.green,
+              ),
+            ],
+          ),
+          Text(
+            comic.introduce,
+            style: TvStyle.fontAppWithCustom(),
+          ),
+        ],
       ),
     );
   }
@@ -64,6 +120,7 @@ class DetailHeaderComicWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var date = DateTime.fromMillisecondsSinceEpoch(comic.timeFix * 1000);
     return Container(
       padding: EdgeInsets.all(5),
       child: Row(
@@ -84,13 +141,24 @@ class DetailHeaderComicWidget extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Text(
                   'Tác giả: ${comic.author}',
                   style: TvStyle.fontAppWithCustom(),
                 ),
                 Text(
-                  'Đánh giá: ${comic.avgRate}',
+                  'Đánh giá: ${comic.avgRate}/5',
+                  style: TvStyle.fontAppWithCustom(),
+                ),
+                Text(
+                  'Trạng thái: ${comic.finish == 1 ? 'Đã hoàn thành' : 'Chưa hoàn thành'}',
+                  style: TvStyle.fontAppWithCustom(),
+                ),
+                Text(
+                  'Cập nhật mới nhất: ${date.hour.toString().length == 1 ? '0${date.hour}' : date.hour}:'
+                  '${date.minute.toString().length == 1 ? '0${date.minute}' : date.minute} '
+                  '${date.day}/${date.month}/${date.year}',
                   style: TvStyle.fontAppWithCustom(),
                 ),
               ],
@@ -99,5 +167,79 @@ class DetailHeaderComicWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class DetailFooterComicWidget extends StatefulWidget {
+  final Comic comic;
+
+  const DetailFooterComicWidget({this.comic});
+
+  @override
+  _DetailFooterComicWidgetState createState() =>
+      _DetailFooterComicWidgetState();
+}
+
+class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 10,),
+            height: 1,
+            color: Colors.black12,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.format_list_bulleted,color: AppColor.green,size: 30,),
+                SizedBox(width: 10,),
+                Text(
+                  'Danh sách chương',
+                  style: TvStyle.fontAppWithCustom(color: AppColor.green,),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            height: 1,
+            color: Colors.black12,
+          ),
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (context, index) => ExpansionTile(
+              title: Text('1'),
+              children: <Widget>[
+                Column(
+                  children: _buildExpandableContent('title'),
+                ),
+              ],
+            ),
+            itemCount: 5,
+          )
+        ],
+      ),
+    );
+  }
+
+  _buildExpandableContent(String vehicle) {
+    List<Widget> columnContent = [];
+
+    for (var i = 0; i < 5; i++)
+      columnContent.add(
+        new ListTile(
+          title: new Text(
+            vehicle,
+            style: new TextStyle(fontSize: 18.0),
+          ),
+          leading: new Icon(LineAwesomeIcons.user),
+        ),
+      );
+
+    return columnContent;
   }
 }
