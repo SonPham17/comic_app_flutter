@@ -1,8 +1,11 @@
+import 'dart:isolate';
+
 import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
 import 'package:comicappflutter/module/detail/comic/detail_comic_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
+import 'package:comicappflutter/shared/model/chapter.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,7 +44,7 @@ class DetailComicListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (_) => DetailComicBloc.getInstance(
+      create: (_) => DetailComicBloc(
         detailRepo: Provider.of(context),
       ),
       child: Consumer<DetailComicBloc>(
@@ -55,6 +58,7 @@ class DetailComicListWidget extends StatelessWidget {
                 comic: comic,
               ),
               DetailFooterComicWidget(
+                bloc: bloc,
                 comic: comic,
               ),
             ],
@@ -172,8 +176,9 @@ class DetailHeaderComicWidget extends StatelessWidget {
 
 class DetailFooterComicWidget extends StatefulWidget {
   final Comic comic;
+  final DetailComicBloc bloc;
 
-  const DetailFooterComicWidget({this.comic});
+  const DetailFooterComicWidget({this.comic, this.bloc});
 
   @override
   _DetailFooterComicWidgetState createState() =>
@@ -182,12 +187,20 @@ class DetailFooterComicWidget extends StatefulWidget {
 
 class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    widget.bloc.getChaptersList(widget.comic.id);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(top: 10,),
+            margin: EdgeInsets.only(
+              top: 10,
+            ),
             height: 1,
             color: Colors.black12,
           ),
@@ -195,11 +208,19 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: <Widget>[
-                Icon(Icons.format_list_bulleted,color: AppColor.green,size: 30,),
-                SizedBox(width: 10,),
+                Icon(
+                  Icons.format_list_bulleted,
+                  color: AppColor.green,
+                  size: 30,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
                 Text(
                   'Danh sách chương',
-                  style: TvStyle.fontAppWithCustom(color: AppColor.green,),
+                  style: TvStyle.fontAppWithCustom(
+                    color: AppColor.green,
+                  ),
                 ),
               ],
             ),
@@ -208,22 +229,69 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
             height: 1,
             color: Colors.black12,
           ),
-          ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemBuilder: (context, index) => ExpansionTile(
-              title: Text('1'),
-              children: <Widget>[
-                Column(
-                  children: _buildExpandableContent('title'),
-                ),
-              ],
+          Container(
+            child: StreamProvider<List<Chapter>>.value(
+              value: widget.bloc.chaptersStream,
+              child: Consumer<List<Chapter>>(
+                builder: (context, data, child) {
+                  if (data != null) {
+                    if (data.length == 0) {
+                      return Container(
+                        height: 170,
+                        child: Center(
+                          child: Text('Chưa có dữ liệu về truyện này',
+                              style: TvStyle.fontAppWithCustom()),
+                        ),
+                      );
+                    }
+
+                    if (data.length != 0) {
+                      var vol = createNewIsolateChapter(data);
+                      return ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => ExpansionTile(
+                          title: Text('1'),
+                          children: <Widget>[
+                            Column(
+                              children: _buildExpandableContent('title'),
+                            ),
+                          ],
+                        ),
+                        itemCount: 3,
+                      );
+                    }
+                  }
+
+                  return Container(
+                    height: 170,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: AppColor.green,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-            itemCount: 5,
           )
         ],
       ),
     );
+  }
+
+  List<Chapter> createNewIsolateChapter(List<Chapter> listChapters) {
+    var receivePort = ReceivePort();
+    Isolate.spawn(taskChapterRunner, receivePort.sendPort);
+
+    receivePort.listen((message) {
+      return message;
+    });
+    return null;
+  }
+
+  static void taskChapterRunner(SendPort sendPort) {
+    var total = 0;
   }
 
   _buildExpandableContent(String vehicle) {
@@ -241,5 +309,11 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
       );
 
     return columnContent;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.bloc.dispose();
   }
 }
