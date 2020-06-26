@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:isolate';
 
 import 'package:comicappflutter/base/base_widget.dart';
@@ -9,6 +10,7 @@ import 'package:comicappflutter/shared/model/chapter.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:provider/provider.dart';
@@ -246,20 +248,22 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
                     }
 
                     if (data.length != 0) {
-                      var vol = createNewIsolateChapter(data);
-                      return ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) => ExpansionTile(
-                          title: Text('1'),
-                          children: <Widget>[
-                            Column(
-                              children: _buildExpandableContent('title'),
-                            ),
-                          ],
-                        ),
-                        itemCount: 3,
-                      );
+                      getChapterByVol(data).then((value) {
+                        print('getChapterByVol ${value.length}');
+                        return ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) => ExpansionTile(
+                            title: Text('Phần ${value[0].vol}'),
+                            children: <Widget>[
+                              Column(
+                                children: _buildExpandableContent(value),
+                              ),
+                            ],
+                          ),
+                          itemCount: value.length,
+                        );
+                      });
                     }
                   }
 
@@ -280,28 +284,24 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
     );
   }
 
-  List<Chapter> createNewIsolateChapter(List<Chapter> listChapters) {
-    var receivePort = ReceivePort();
-    Isolate.spawn(taskChapterRunner, receivePort.sendPort);
-
-    receivePort.listen((message) {
-      return message;
-    });
-    return null;
+  Future<List<Chapter>> getChapterByVol(List<Chapter> data) async {
+    var listChapters = List<Chapter>();
+    for (int i = 0; i < data.length; i++) {
+      if (data[i].vol == 1) {
+        listChapters.add(data[i]);
+      }
+    }
+    return listChapters;
   }
 
-  static void taskChapterRunner(SendPort sendPort) {
-    var total = 0;
-  }
-
-  _buildExpandableContent(String vehicle) {
+  _buildExpandableContent(List<Chapter> listChapters) {
     List<Widget> columnContent = [];
 
-    for (var i = 0; i < 5; i++)
+    for (var i = 0; i < listChapters.length; i++)
       columnContent.add(
         new ListTile(
           title: new Text(
-            vehicle,
+            listChapters[i].nameIdChapter,
             style: new TextStyle(fontSize: 18.0),
           ),
           leading: new Icon(LineAwesomeIcons.user),
