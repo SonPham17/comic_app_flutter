@@ -2,28 +2,48 @@ import 'package:comicappflutter/network/comic_client.dart';
 import 'package:dio/dio.dart';
 
 class HighlightService {
-  Future<Response> getNominateComicList() {
-    return ComicClient.instance.dio
-        .get('/hello_novel/public/api/stories/nominate');
+  Future<Response> getNominateComicList(String nextCursor) {
+    return ComicClient.instance.dio.get(
+      '/hello_novel/public/api/stories/nominate',
+      queryParameters: {
+        'next_cursor': nextCursor,
+      },
+    );
   }
 
-  Future<Response> getNewUpdateComicList() {
-    return ComicClient.instance.dio
-        .get('/hello_novel/public/api/stories/time_fix');
+  Future<Response> getNewUpdateComicList(String nextCursor) {
+    return ComicClient.instance.dio.get(
+      '/hello_novel/public/api/stories/time_fix',
+      queryParameters: {
+        'next_cursor': nextCursor,
+      },
+    );
   }
 
-  Future<Response> getNewCreatedComicList() {
-    return ComicClient.instance.dio
-        .get('/hello_novel/public/api/stories/new_create');
+  Future<Response> getNewCreatedComicList(String nextCursor) {
+    return ComicClient.instance.dio.get(
+      '/hello_novel/public/api/stories/new_create',
+      queryParameters: {
+        'next_cursor': nextCursor,
+      },
+    );
   }
 
-  Future<Response> getFinishedComicList() {
-    return ComicClient.instance.dio
-        .get('/hello_novel/public/api/stories/finish');
+  Future<Response> getFinishedComicList(String nextCursor) {
+    return ComicClient.instance.dio.get(
+      '/hello_novel/public/api/stories/finish',
+      queryParameters: {
+        'next_cursor': nextCursor,
+      },
+    );
   }
 
-  Future<Response> getTopViewComicList() {
-    return ComicClient.instance.dio
-        .get('/hello_novel/public/api/stories/top_month');
+  Future<Response> getTopViewComicList(String nextCursor) {
+    return ComicClient.instance.dio.get(
+      '/hello_novel/public/api/stories/top_month',
+      queryParameters: {
+        'next_cursor': nextCursor,
+      },
+    );
   }
 }

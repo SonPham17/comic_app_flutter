@@ -234,13 +234,22 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
                       fontWeight: FontWeight.bold)),
               margin: EdgeInsets.only(top: 5, left: 5),
             ),
-            Container(
-              child: Text('Xem Thêm',
-                  style: TvStyle.fontAppWithCustom(
-                      size: 18.0,
-                      color: AppColor.green,
-                      textDecoration: TextDecoration.underline)),
-              margin: EdgeInsets.only(right: 5),
+            InkWell(
+              onTap: (){
+                Navigator.pushNamed(context, '/load_more',
+                    arguments: {
+                      'stream' : stream,
+                      'title' : title,
+                    });
+              },
+              child: Container(
+                child: Text('Xem Thêm',
+                    style: TvStyle.fontAppWithCustom(
+                        size: 18.0,
+                        color: AppColor.green,
+                        textDecoration: TextDecoration.underline)),
+                margin: EdgeInsets.only(right: 5),
+              ),
             ),
           ],
         ),

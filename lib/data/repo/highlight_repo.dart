@@ -14,7 +14,7 @@ class HighlightRepo {
   Future<List<Comic>> getNominateComicList() async {
     var c = Completer<List<Comic>>();
     try {
-      var response = await _highlightService.getNominateComicList();
+      var response = await _highlightService.getNominateComicList('');
       var nominateList = Comic.parseComicList(response.data);
       c.complete(nominateList);
     } on DioError {
@@ -29,7 +29,7 @@ class HighlightRepo {
   Future<List<Comic>> getNewUpdateComicList() async {
     var c = Completer<List<Comic>>();
     try {
-      var response = await _highlightService.getNewUpdateComicList();
+      var response = await _highlightService.getNewUpdateComicList('');
       var nominateList = Comic.parseComicList(response.data);
       c.complete(nominateList);
     } on DioError {
@@ -44,7 +44,7 @@ class HighlightRepo {
   Future<List<Comic>> getNewCreatedComicList() async {
     var c = Completer<List<Comic>>();
     try {
-      var response = await _highlightService.getNewCreatedComicList();
+      var response = await _highlightService.getNewCreatedComicList('');
       var nominateList = Comic.parseComicList(response.data);
       c.complete(nominateList);
     } on DioError {
@@ -59,7 +59,7 @@ class HighlightRepo {
   Future<List<Comic>> getFinishedComicList() async {
     var c = Completer<List<Comic>>();
     try {
-      var response = await _highlightService.getFinishedComicList();
+      var response = await _highlightService.getFinishedComicList('');
       var nominateList = Comic.parseComicList(response.data);
       c.complete(nominateList);
     } on DioError {
@@ -74,7 +74,7 @@ class HighlightRepo {
   Future<List<Comic>> getTopViewComicList() async {
     var c = Completer<List<Comic>>();
     try {
-      var response = await _highlightService.getTopViewComicList();
+      var response = await _highlightService.getTopViewComicList('');
       var nominateList = Comic.parseComicList(response.data);
       c.complete(nominateList);
     } on DioError {

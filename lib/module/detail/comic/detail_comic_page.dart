@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:isolate';
-
 import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
@@ -191,6 +188,7 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    print('didChangeDependencies');
     widget.bloc.getChaptersList(widget.comic.id);
   }
 
@@ -232,9 +230,9 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
             color: Colors.black12,
           ),
           Container(
-            child: StreamProvider<List<Chapter>>.value(
+            child: StreamProvider<List<List<Chapter>>>.value(
               value: widget.bloc.chaptersStream,
-              child: Consumer<List<Chapter>>(
+              child: Consumer<List<List<Chapter>>>(
                 builder: (context, data, child) {
                   if (data != null) {
                     if (data.length == 0) {
@@ -248,22 +246,74 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
                     }
 
                     if (data.length != 0) {
-                      getChapterByVol(data).then((value) {
-                        print('getChapterByVol ${value.length}');
-                        return ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) => ExpansionTile(
-                            title: Text('Phần ${value[0].vol}'),
-                            children: <Widget>[
-                              Column(
-                                children: _buildExpandableContent(value),
-                              ),
-                            ],
+                      return ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => ExpansionTile(
+                          title: Text(
+                            'Phần ${index + 1}',
+                            style: TvStyle.fontAppWithCustom(size: 18),
                           ),
-                          itemCount: value.length,
-                        );
-                      });
+                          children: <Widget>[
+                            Column(
+                              children: data[index]
+                                  .map(
+                                    (chapter) => Container(
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: InkWell(
+                                              onTap: (){
+                                                print(chapter.nameIdChapter);
+                                              },
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Text(
+                                                    '${chapter.nameIdChapter}: ${chapter.contentTitleOfChapter}',
+                                                    style: TvStyle
+                                                        .fontAppWithCustom(
+                                                            size: 16),
+                                                  ),
+                                                  Text(
+                                                    '${chapter.updatedAt}',
+                                                    style: TvStyle
+                                                        .fontAppWithCustom(
+                                                            size: 11),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          InkWell(
+                                            child: Icon(LineAwesomeIcons
+                                                .cloud_download),
+                                            onTap: () {
+                                              print(chapter
+                                                  .contentTitleOfChapter);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                            bottom: BorderSide(
+                                          width: 1.0,
+                                          color: Colors.black12,
+                                        )),
+                                      ),
+                                      padding: EdgeInsets.all(8),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
+                        ),
+                        itemCount: data.length,
+                      );
                     }
                   }
 
@@ -282,33 +332,6 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
         ],
       ),
     );
-  }
-
-  Future<List<Chapter>> getChapterByVol(List<Chapter> data) async {
-    var listChapters = List<Chapter>();
-    for (int i = 0; i < data.length; i++) {
-      if (data[i].vol == 1) {
-        listChapters.add(data[i]);
-      }
-    }
-    return listChapters;
-  }
-
-  _buildExpandableContent(List<Chapter> listChapters) {
-    List<Widget> columnContent = [];
-
-    for (var i = 0; i < listChapters.length; i++)
-      columnContent.add(
-        new ListTile(
-          title: new Text(
-            listChapters[i].nameIdChapter,
-            style: new TextStyle(fontSize: 18.0),
-          ),
-          leading: new Icon(LineAwesomeIcons.user),
-        ),
-      );
-
-    return columnContent;
   }
 
   @override

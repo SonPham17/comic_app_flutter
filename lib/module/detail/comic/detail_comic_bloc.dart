@@ -9,17 +9,17 @@ import 'package:rxdart/rxdart.dart';
 class DetailComicBloc extends BaseBloc {
   DetailRepo _detailRepo;
 
-  StreamController<List<Chapter>> _chaptersSubject =
-      BehaviorSubject<List<Chapter>>();
-  Stream<List<Chapter>> get chaptersStream => _chaptersSubject.stream;
-  Sink<List<Chapter>> get chapterscSink => _chaptersSubject.sink;
+  StreamController<List<List<Chapter>>> _chaptersSubject =
+      BehaviorSubject<List<List<Chapter>>>();
+  Stream<List<List<Chapter>>> get chaptersStream => _chaptersSubject.stream;
+  Sink<List<List<Chapter>>> get chaptersSink => _chaptersSubject.sink;
 
   DetailComicBloc({DetailRepo detailRepo}) : _detailRepo = detailRepo;
 
   void getChaptersList(int idComic) {
     _detailRepo
         .getChaptersList(idComic)
-        .then((value) => chapterscSink.add(value));
+        .then((value) => chaptersSink.add(value));
   }
 
   @override
