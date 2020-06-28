@@ -263,7 +263,7 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
                                         children: <Widget>[
                                           Expanded(
                                             child: InkWell(
-                                              onTap: (){
+                                              onTap: () {
                                                 print(chapter.nameIdChapter);
                                               },
                                               child: Column(
