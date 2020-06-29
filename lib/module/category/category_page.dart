@@ -74,7 +74,7 @@ class CategoryListWidget extends StatelessWidget {
                     physics: ScrollPhysics(),
                     shrinkWrap: true,
                     children: categoryList
-                        .map((category) => _buildItemGrid(category))
+                        .map((category) => _buildItemGrid(context,category))
                         .toList(),
                   ),
                 ),
@@ -86,13 +86,16 @@ class CategoryListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildItemGrid(Category category) {
+  Widget _buildItemGrid(BuildContext context,Category category) {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10), color: AppColor.green),
       child: FlatButton(
         onPressed: () {
-          print('');
+          Navigator.pushNamed(context, '/detail/category_page', arguments: {
+            'title': category.name,
+            'id': category.id,
+          });
         },
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Center(

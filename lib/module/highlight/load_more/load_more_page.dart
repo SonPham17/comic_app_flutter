@@ -23,7 +23,6 @@ class _LoadMorePageState extends State<LoadMorePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _args = ModalRoute.of(context).settings.arguments as Map;
-    print(_args['type']);
   }
 
   @override
@@ -69,29 +68,10 @@ class _LoadMoreGridWidgetState extends State<LoadMoreGridWidget> {
   bool _canLoadMore = true;
 
   Future<void> _refresh() async {
-    print('_refresh');
     _canLoadMore = true;
   }
 
-  Future<void> _getColors(HighlightBloc bloc) async {
-    _loading = true;
-    bloc.event.add(LoadMoreEvent(type: widget.type));
-//    final newColors =
-//        await getColorsFromServer(page: _nextPage, limit: _itemsPerPage);
-
-//    setState(() {
-//      _colors.addAll(newColors);
-
-//      if (newColors.length < _itemsPerPage) {
-//        _canLoadMore = false;
-//      }
-
-//    _loading = false;
-//    });
-  }
-
   void setupStreamAndController(HighlightBloc bloc) {
-    print('setupStreamAndController');
     switch (widget.type) {
       case 1:
         _stream = bloc.topViewComicStream;
@@ -115,8 +95,8 @@ class _LoadMoreGridWidgetState extends State<LoadMoreGridWidget> {
           _controller.position.extentAfter < _endReachedThreshold;
 
       if (thresholdReached) {
-        print('thresholdReached');
-        _getColors(bloc);
+        _loading = true;
+        bloc.event.add(LoadMoreEvent(type: widget.type));
       }
     });
   }
