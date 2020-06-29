@@ -4,7 +4,6 @@ class ComicClient {
   static BaseOptions _options = BaseOptions(
     baseUrl: 'http://144.202.5.152',
     connectTimeout: 5000,
-    receiveTimeout: 3000,
   );
 
   static Dio _dio = Dio(_options);

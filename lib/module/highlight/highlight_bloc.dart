@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:comicappflutter/base/base_bloc.dart';
 import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/repo/highlight_repo.dart';
+import 'package:comicappflutter/module/highlight/load_more/event/load_more_event.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
@@ -9,47 +10,65 @@ import 'package:rxdart/rxdart.dart';
 class HighlightBloc extends BaseBloc {
   HighlightRepo _highlightRepo;
 
-  StreamController<List<Comic>> _nominateComicSubject =
-      BehaviorSubject<List<Comic>>();
-  Stream<List<Comic>> get nominateComicStream => _nominateComicSubject.stream;
-  Sink<List<Comic>> get nominateComicSink => _nominateComicSubject.sink;
+  String _nextCursorTopView = '';
+  String _nextCursorNewCreated = '';
+  String _nextCursorNewUpdate = '';
+  String _nextCursorFinishedComic = '';
 
-  StreamController<List<Comic>> _topViewComicSubject =
-  BehaviorSubject<List<Comic>>();
-  Stream<List<Comic>> get topViewComicStream => _topViewComicSubject.stream;
-  Sink<List<Comic>> get topViewComicSink => _topViewComicSubject.sink;
+  StreamController<Object> _nominateComicSubject = BehaviorSubject<Object>();
 
-  StreamController<List<Comic>> _newCreatedComicSubject =
-      BehaviorSubject<List<Comic>>();
-  Stream<List<Comic>> get newCreatedComicStream =>
-      _newCreatedComicSubject.stream;
-  Sink<List<Comic>> get newCreatedComicSink => _newCreatedComicSubject.sink;
+  Stream<Object> get nominateComicStream => _nominateComicSubject.stream;
 
-  StreamController<List<Comic>> _newUpdateComicSubject =
-      BehaviorSubject<List<Comic>>();
-  Stream<List<Comic>> get newUpdateComicStream => _newUpdateComicSubject.stream;
-  Sink<List<Comic>> get newUpdateComicSink => _newUpdateComicSubject.sink;
+  Sink<Object> get nominateComicSink => _nominateComicSubject.sink;
 
-  StreamController<List<Comic>> _finishedComicSubject =
-  BehaviorSubject<List<Comic>>();
-  Stream<List<Comic>> get finishedComicStream => _finishedComicSubject.stream;
-  Sink<List<Comic>> get finishedComicSink => _finishedComicSubject.sink;
+  StreamController<Object> _topViewComicSubject = BehaviorSubject<Object>();
 
-  static HighlightBloc _instance;
+  Stream<Object> get topViewComicStream => _topViewComicSubject.stream;
 
-  static HighlightBloc getInstance({@required HighlightRepo highlightRepo}) {
-    if (_instance == null) {
-      _instance = HighlightBloc._internal(highlightRepo: highlightRepo);
-    }
-    return _instance;
-  }
+  Sink<Object> get topViewComicSink => _topViewComicSubject.sink;
 
-  HighlightBloc._internal({@required HighlightRepo highlightRepo})
-      : _highlightRepo = highlightRepo;
+  StreamController<Object> _newCreatedComicSubject = BehaviorSubject<Object>();
+
+  Stream<Object> get newCreatedComicStream => _newCreatedComicSubject.stream;
+
+  Sink<Object> get newCreatedComicSink => _newCreatedComicSubject.sink;
+
+  StreamController<Object> _newUpdateComicSubject = BehaviorSubject<Object>();
+
+  Stream<Object> get newUpdateComicStream => _newUpdateComicSubject.stream;
+
+  Sink<Object> get newUpdateComicSink => _newUpdateComicSubject.sink;
+
+  StreamController<Object> _finishedComicSubject = BehaviorSubject<Object>();
+
+  Stream<Object> get finishedComicStream => _finishedComicSubject.stream;
+
+  Sink<Object> get finishedComicSink => _finishedComicSubject.sink;
+
+  HighlightBloc({HighlightRepo highlightRepo}) : _highlightRepo = highlightRepo;
 
   @override
   void dispatchEvent(BaseEvent event) {
-    print(event);
+    switch (event.runtimeType) {
+      case LoadMoreEvent:
+        LoadMoreEvent loadMoreEvent = event as LoadMoreEvent;
+        int type = loadMoreEvent.type;
+        switch(type){
+          case 1:
+            getTopViewComicList();
+            break;
+          case 2:
+            getNewUpdateComicList();
+            break;
+          case 3:
+            getNewCreatedComicList();
+            break;
+          case 4:
+            getFinishedComicList();
+            break;
+        }
+        break;
+    }
   }
 
   void getNominateComicList() {
@@ -59,33 +78,38 @@ class HighlightBloc extends BaseBloc {
   }
 
   void getNewUpdateComicList() {
-    _highlightRepo
-        .getNewUpdateComicList()
-        .then((value) => newUpdateComicSink.add(value));
+    _highlightRepo.getNewUpdateComicList(_nextCursorNewUpdate).then((value) {
+      _nextCursorNewUpdate = value['next_cursor'];
+      newUpdateComicSink.add(value);
+    });
   }
 
   void getNewCreatedComicList() {
-    _highlightRepo
-        .getNewCreatedComicList()
-        .then((value) => newCreatedComicSink.add(value));
+    _highlightRepo.getNewCreatedComicList(_nextCursorNewCreated).then((value) {
+      _nextCursorNewCreated = value['next_cursor'];
+      newCreatedComicSink.add(value);
+    });
   }
 
   void getFinishedComicList() {
-    _highlightRepo
-        .getFinishedComicList()
-        .then((value) => finishedComicSink.add(value));
+    _highlightRepo.getFinishedComicList(_nextCursorFinishedComic).then((value) {
+      _nextCursorFinishedComic = value['next_cursor'];
+      finishedComicSink.add(value);
+    });
   }
 
   void getTopViewComicList() {
-    _highlightRepo
-        .getTopViewComicList()
-        .then((value) => topViewComicSink.add(value));
+    print('Next Cursor=   $_nextCursorTopView');
+    _highlightRepo.getTopViewComicList(_nextCursorTopView).then((value) {
+      _nextCursorTopView = value['next_cursor'];
+      topViewComicSink.add(value);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    print('dispose');
+    print('highlight dispose');
     _nominateComicSubject.close();
     _newCreatedComicSubject.close();
     _newUpdateComicSubject.close();

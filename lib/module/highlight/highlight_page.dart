@@ -51,30 +51,34 @@ class HighlightListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (_) => HighlightBloc.getInstance(
+      create: (_) => HighlightBloc(
         highlightRepo: Provider.of(context),
       ),
       child: Consumer<HighlightBloc>(
         builder: (context, bloc, child) => SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              _buildNominateComic(bloc,context),
+              _buildNominateComic(bloc, context),
               ItemComicListPage(
+                type: 1,
                 title: 'Xem Nhiều Trong Tháng',
                 stream: bloc.topViewComicStream,
                 loadApi: bloc.getTopViewComicList,
               ),
               ItemComicListPage(
+                type: 2,
                 title: 'Mới Cập Nhật',
                 stream: bloc.newUpdateComicStream,
                 loadApi: bloc.getNewUpdateComicList,
               ),
               ItemComicListPage(
+                type: 3,
                 title: 'Mới Tạo',
                 stream: bloc.newCreatedComicStream,
                 loadApi: bloc.getNewCreatedComicList,
               ),
               ItemComicListPage(
+                type: 4,
                 title: 'Đã Hoàn Thành',
                 stream: bloc.finishedComicStream,
                 loadApi: bloc.getFinishedComicList,
@@ -86,7 +90,7 @@ class HighlightListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildNominateComic(HighlightBloc bloc,BuildContext context) {
+  Widget _buildNominateComic(HighlightBloc bloc, BuildContext context) {
     bloc.getNominateComicList();
     return Container(
       child: StreamProvider<Object>.value(
@@ -108,6 +112,7 @@ class HighlightListWidget extends StatelessWidget {
               );
             }
 
+            data = Comic.parseComicList(data);
             if (data is RestError) {
               return Center(
                 child: Container(
@@ -130,7 +135,7 @@ class HighlightListWidget extends StatelessWidget {
                       enlargeCenterPage: true,
                       viewportFraction: 0.8,
                     ),
-                    items: setupCarouseList(nominateList,context),
+                    items: setupCarouseList(nominateList, context),
                   )
                 ],
               ),
@@ -141,14 +146,14 @@ class HighlightListWidget extends StatelessWidget {
     );
   }
 
-  List<Widget> setupCarouseList(List<Comic> comis,BuildContext context) {
+  List<Widget> setupCarouseList(List<Comic> comis, BuildContext context) {
     return comis
         .map((item) => Container(
               margin: EdgeInsets.all(5.0),
               child: GestureDetector(
-                onTap: (){
+                onTap: () {
                   Navigator.pushNamed(context, '/detail/comic_page',
-                  arguments: item);
+                      arguments: item);
                 },
                 child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -195,13 +200,18 @@ class HighlightListWidget extends StatelessWidget {
 class ItemComicListPage extends StatefulWidget {
   final String _title;
   final Function _loadApi;
-  final Stream<List<Comic>> _stream;
+  final Stream<Object> _stream;
+  final int _type;
 
   ItemComicListPage(
-      {@required String title, Function loadApi, Stream<List<Comic>> stream})
+      {@required String title,
+      @required Function loadApi,
+      @required Stream<Object> stream,
+      @required int type})
       : _title = title,
         _stream = stream,
-        _loadApi = loadApi;
+        _loadApi = loadApi,
+        _type = type;
 
   @override
   _ItemComicListPageState createState() => _ItemComicListPageState();
@@ -217,94 +227,92 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _baseBuildWidgetComic(stream: widget._stream, title: widget._title);
+    return _baseBuildWidgetComic(
+        stream: widget._stream, title: widget._title, type: widget._type);
   }
 
-  Widget _baseBuildWidgetComic({Stream<List<Comic>> stream, String title}) {
-    return Column(
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              child: Text(title,
-                  style: TvStyle.fontAppWithCustom(
-                      size: 20.0,
-                      color: AppColor.green,
-                      fontWeight: FontWeight.bold)),
-              margin: EdgeInsets.only(top: 5, left: 5),
+  Widget _baseBuildWidgetComic(
+      {Stream<Object> stream, String title, int type}) {
+    return StreamProvider<Object>.value(
+      value: stream,
+      initialData: null,
+      catchError: (context, error) {
+        print('Không thể tải mới dữ liệu');
+        BotToast.showText(text: 'Không thể tải mới dữ liệu');
+        return error;
+      },
+      child: Consumer<Object>(builder: (_, data, child) {
+        if (data == null) {
+          return Container(
+            height: 170,
+            child: Center(
+              child: CircularProgressIndicator(
+                backgroundColor: AppColor.blue,
+              ),
             ),
-            InkWell(
-              onTap: (){
-                Navigator.pushNamed(context, '/load_more',
-                    arguments: {
-                      'stream' : stream,
-                      'title' : title,
+          );
+        }
+
+        if (data is RestError) {
+          BotToast.showText(text: 'Không thể tải mới dữ liệu');
+        }
+
+        var mapData = data as Map;
+        var newUpdateList = Comic.parseComicList(mapData);
+        return Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  child: Text(title,
+                      style: TvStyle.fontAppWithCustom(
+                          size: 20.0,
+                          color: AppColor.green,
+                          fontWeight: FontWeight.bold)),
+                  margin: EdgeInsets.only(top: 5, left: 5),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/load_more', arguments: {
+                      'title': title,
+                      'type': type
                     });
-              },
-              child: Container(
-                child: Text('Xem Thêm',
-                    style: TvStyle.fontAppWithCustom(
-                        size: 18.0,
-                        color: AppColor.green,
-                        textDecoration: TextDecoration.underline)),
-                margin: EdgeInsets.only(right: 5),
+                  },
+                  child: Container(
+                    child: Text('Xem Thêm',
+                        style: TvStyle.fontAppWithCustom(
+                            size: 18.0,
+                            color: AppColor.green,
+                            textDecoration: TextDecoration.underline)),
+                    margin: EdgeInsets.only(right: 5),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              child: Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: GridView.count(
+                  crossAxisCount: 3,
+                  // số lượng cột trong 1 hàng
+                  mainAxisSpacing: 5,
+                  // khoảng cách giữa các thằng con theo trục dọc
+                  crossAxisSpacing: 5,
+                  // khoảng cách giữa các cột theo trục ngang
+                  padding: EdgeInsets.all(5),
+                  childAspectRatio: 0.5,
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  children: newUpdateList
+                      .map((comic) => _buildItemGrid(comic))
+                      .toList(),
+                ),
               ),
             ),
           ],
-        ),
-        Container(
-          child: StreamProvider<List<Comic>>.value(
-            value: stream,
-            initialData: null,
-            catchError: (context, error) {
-              print('Không thể tải mới dữ liệu');
-              BotToast.showText(text: 'Không thể tải mới dữ liệu');
-              return error;
-            },
-            child: Consumer<List<Comic>>(
-              builder: (_, data, child) {
-                if (data == null) {
-                  return Container(
-                    height: 170,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: AppColor.blue,
-                      ),
-                    ),
-                  );
-                }
-
-                if (data is RestError) {
-                  BotToast.showText(text: 'Không thể tải mới dữ liệu');
-                }
-
-                var newUpdateList = data;
-                return Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(1.0),
-                    child: GridView.count(
-                      crossAxisCount: 3,
-                      // số lượng cột trong 1 hàng
-                      mainAxisSpacing: 5,
-                      // khoảng cách giữa các thằng con theo trục dọc
-                      crossAxisSpacing: 5,
-                      // khoảng cách giữa các cột theo trục ngang
-                      padding: EdgeInsets.all(5),
-                      childAspectRatio: 0.5,
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      children: newUpdateList
-                          .map((comic) => _buildItemGrid(comic))
-                          .toList(),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        )
-      ],
+        );
+      }),
     );
   }
 
@@ -313,7 +321,7 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
       child: Column(
         children: <Widget>[
           GestureDetector(
-            onTap: (){
+            onTap: () {
               Navigator.pushNamed(context, '/detail/comic_page',
                   arguments: comic);
             },
@@ -331,16 +339,15 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
           Expanded(
             child: Center(
                 child: Text(
-                  comic.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TvStyle.fontAppWithSize(12),
-                  textAlign: TextAlign.center,
-                )),
+              comic.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TvStyle.fontAppWithSize(12),
+              textAlign: TextAlign.center,
+            )),
           )
         ],
       ),
     );
   }
 }
-
