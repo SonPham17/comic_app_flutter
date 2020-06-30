@@ -7,6 +7,7 @@ import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/model/rest_error.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
+import 'package:comicappflutter/shared/widget/item_grid_comic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,7 @@ class HighlightPage extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.search),
           onPressed: () {
-            print('search');
+            Navigator.pushNamed(context, '/search');
           },
         )
       ],
@@ -305,7 +306,7 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
                   physics: NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   children: newUpdateList
-                      .map((comic) => _buildItemGrid(comic))
+                      .map((comic) => ItemGridComic(comic: comic,))
                       .toList(),
                 ),
               ),
@@ -313,41 +314,6 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
           ],
         );
       }),
-    );
-  }
-
-  Widget _buildItemGrid(Comic comic) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, '/detail/comic_page',
-                  arguments: comic);
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                  'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
-                  height: 180,
-                  fit: BoxFit.cover),
-            ),
-          ),
-          SizedBox(
-            height: 3,
-          ),
-          Expanded(
-            child: Center(
-                child: Text(
-              comic.name,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TvStyle.fontAppWithSize(12),
-              textAlign: TextAlign.center,
-            )),
-          )
-        ],
-      ),
     );
   }
 }
