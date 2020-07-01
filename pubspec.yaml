@@ -37,6 +37,9 @@ dependencies:
   tabbar: ^0.0.3
   line_awesome_icons: ^1.0.4+2
   bot_toast: ^3.0.0
+  keyboard_dismisser: ^1.0.2
+  epub_kitty: ^0.1.7
+  path_provider: ^1.6.11
 
 dev_dependencies:
   flutter_test:

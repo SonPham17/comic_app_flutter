@@ -42,6 +42,11 @@ class Comic {
     return list.map((product) => Comic.fromJson(product)).toList();
   }
 
+  static List<Comic> parseComicListBySearch(map) {
+    var list = map['stories'] as List;
+    return list.map((product) => Comic.fromJson(product)).toList();
+  }
+
   factory Comic.fromJson(Map<String, dynamic> json) => Comic(
         id: json["id"],
         name: json["name"],

@@ -20,7 +20,7 @@ class HighlightPage extends StatelessWidget {
       leading: IconButton(
         icon: Icon(Icons.free_breakfast),
         onPressed: () {
-          print('leading');
+          Navigator.pushNamed(context, '/detail/chapter_page');
         },
       ),
       title: 'Novel Galaxy',

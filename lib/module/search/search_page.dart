@@ -1,5 +1,8 @@
+import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/search_service.dart';
 import 'package:comicappflutter/data/repo/search_repo.dart';
+import 'package:comicappflutter/module/search/event/search_event.dart';
+import 'package:comicappflutter/module/search/event/type_search_event.dart';
 import 'package:comicappflutter/module/search/search_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
@@ -8,6 +11,7 @@ import 'package:comicappflutter/shared/widget/custom_appbar.dart';
 import 'package:comicappflutter/shared/widget/item_grid_comic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:provider/provider.dart';
 
 enum TypeSearch { tacgia, tentruyen }
@@ -18,13 +22,12 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final searchController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
-    double statusBarHeight = MediaQuery.of(context).padding.top;
-    return MultiProvider(
-      providers: [
+    return PageContainer(
+      bloc: [],
+      title: 'Tìm kiếm',
+      di: [
         Provider.value(
           value: SearchService(),
         ),
@@ -33,84 +36,12 @@ class _SearchPageState extends State<SearchPage> {
               SearchRepo(searchService: searchService),
         )
       ],
-      child: Scaffold(
-        appBar: CustomAppBar(
-          height: 92,
-          child: Provider(
-              create: (_) => SearchBloc.getInstance(
-                    searchRepo: Provider.of(context),
-                  ),
-              child: Consumer<SearchBloc>(
-                builder: (context, bloc, child) {
-                  return Container(
-                    padding: EdgeInsets.only(
-                        top: statusBarHeight + 6, bottom: 6, left: 5, right: 5),
-                    child: Row(
-                      children: <Widget>[
-                        InkWell(
-                          child: Icon(Icons.keyboard_backspace),
-                          onTap: () {},
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: Colors.white,
-                            ),
-                            child: Center(
-                              child: Container(
-                                padding: EdgeInsets.only(left: 5),
-                                child: TextField(
-                                  controller: searchController,
-                                  keyboardType: TextInputType.text,
-                                  cursorColor: Colors.green,
-                                  style: TvStyle.fontAppWithCustom(size: 14),
-                                  decoration: InputDecoration(
-                                      icon: Icon(Icons.search),
-                                      focusedBorder: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      hintText: 'Nhập từ khóa để tìm kiếm',
-                                      hintStyle:
-                                          TvStyle.fontAppWithCustom(size: 14)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            var query = searchController.text;
-                            if (query.isEmpty) {
-                              final snackBar = SnackBar(
-                                content: Text(
-                                  'Nội dung quá ngắn để tìm kiếm',
-                                  style: TvStyle.fontAppWithCustom(),
-                                ),
-                                backgroundColor: Colors.red,
-                              );
-                              Scaffold.of(context).showSnackBar(snackBar);
-                            }
-                          },
-                          child: Text(
-                            'Tìm kiếm',
-                            style: TvStyle.fontAppWithCustom(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              )),
-        ),
-        body: SearchListWidget(),
+      child: KeyboardDismisser(
+        child: SearchListWidget(),
+        gestures: [
+          GestureType.onTap,
+          GestureType.onPanUpdateDownDirection,
+        ],
       ),
     );
   }
@@ -127,42 +58,55 @@ class _SearchListWidgetState extends State<SearchListWidget> {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (_) => SearchBloc.getInstance(
+      create: (_) => SearchBloc(
         searchRepo: Provider.of(context),
       ),
       child: Consumer<SearchBloc>(
         builder: (context, bloc, child) => Container(
           child: Column(
             children: <Widget>[
-              ListTile(
-                title: Text(
-                  'Theo tên tác giả',
-                  style: TvStyle.fontAppWithCustom(),
-                ),
-                leading: Radio(
-                  value: TypeSearch.tacgia,
-                  groupValue: _type,
-                  onChanged: (value) {
-                    setState(() {
-                      _type = value;
-                    });
-                  },
-                ),
+              SearchWidget(
+                searchBloc: bloc,
               ),
-              ListTile(
-                title: Text(
-                  'Theo tên truyện',
-                  style: TvStyle.fontAppWithCustom(),
-                ),
-                leading: Radio(
-                  value: TypeSearch.tentruyen,
-                  groupValue: _type,
-                  onChanged: (value) {
-                    setState(() {
-                      _type = value;
-                    });
-                  },
-                ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: ListTile(
+                      title: Text(
+                        'Theo tên tác giả',
+                        style: TvStyle.fontAppWithCustom(),
+                      ),
+                      leading: Radio(
+                        value: TypeSearch.tacgia,
+                        groupValue: _type,
+                        onChanged: (value) {
+                          setState(() {
+                            _type = value;
+                            bloc.event.add(TypeSearchEvent(type: 'tac_gia'));
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListTile(
+                      title: Text(
+                        'Theo tên truyện',
+                        style: TvStyle.fontAppWithCustom(),
+                      ),
+                      leading: Radio(
+                        value: TypeSearch.tentruyen,
+                        groupValue: _type,
+                        onChanged: (value) {
+                          setState(() {
+                            _type = value;
+                            bloc.event.add(TypeSearchEvent(type: 'ten_truyen'));
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Expanded(
                 child: StreamProvider<List<Comic>>.value(
@@ -178,6 +122,17 @@ class _SearchListWidgetState extends State<SearchListWidget> {
                               backgroundColor: AppColor.blue,
                             ),
                           ),
+                        );
+                      }
+
+                      if (data.length == 0) {
+                        return Container(
+                          height: 170,
+                          child: Center(
+                              child: Text(
+                            'Không có dữ liệu với từ khóa',
+                            style: TvStyle.fontAppWithCustom(),
+                          )),
                         );
                       }
 
@@ -209,6 +164,94 @@ class _SearchListWidgetState extends State<SearchListWidget> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class SearchWidget extends StatefulWidget {
+  final SearchBloc searchBloc;
+
+  SearchWidget({@required this.searchBloc});
+
+  @override
+  _SearchWidgetState createState() => _SearchWidgetState();
+}
+
+class _SearchWidgetState extends State<SearchWidget> {
+  final searchController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: Colors.white,
+              ),
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.only(left: 5),
+                  child: TextField(
+                    controller: searchController,
+                    keyboardType: TextInputType.text,
+                    cursorColor: Colors.green,
+                    style: TvStyle.fontAppWithCustom(size: 14),
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.search),
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        hintText: 'Nhập từ khóa để tìm kiếm',
+                        hintStyle: TvStyle.fontAppWithCustom(size: 14)),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          StreamProvider<bool>.value(
+            initialData: true,
+            value: widget.searchBloc.btnSearchStream,
+            child: Consumer<bool>(
+              builder: (context, enable, child) => RaisedButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                onPressed: enable
+                    ? () {
+                        var query = searchController.text;
+                        if (query.isEmpty) {
+                          final snackBar = SnackBar(
+                            content: Text(
+                              'Nội dung quá ngắn để tìm kiếm',
+                              style: TvStyle.fontAppWithCustom(),
+                            ),
+                            backgroundColor: Colors.red,
+                          );
+                          Scaffold.of(context).showSnackBar(snackBar);
+                        } else {
+                          widget.searchBloc.event
+                              .add(SearchEvent(query: query));
+                          widget.searchBloc.btnSearchSink.add(false);
+                        }
+                      }
+                    : null,
+                color: AppColor.green,
+                child: Text(
+                  'Tìm kiếm',
+                  style: TvStyle.fontAppWithCustom(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
