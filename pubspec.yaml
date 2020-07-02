@@ -40,6 +40,7 @@ dependencies:
   keyboard_dismisser: ^1.0.2
   epub_kitty: ^0.1.7
   path_provider: ^1.6.11
+  animations: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +60,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

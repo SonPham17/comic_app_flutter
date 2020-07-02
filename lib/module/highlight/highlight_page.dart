@@ -1,13 +1,17 @@
+import 'package:animations/animations.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:comicappflutter/base/base_widget.dart';
+import 'package:comicappflutter/container_transition.dart';
 import 'package:comicappflutter/data/remote/highlight_service.dart';
 import 'package:comicappflutter/data/repo/highlight_repo.dart';
+import 'package:comicappflutter/module/detail/comic/detail_comic_page.dart';
 import 'package:comicappflutter/module/highlight/highlight_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/model/rest_error.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:comicappflutter/shared/widget/item_grid_comic.dart';
+import 'package:comicappflutter/shared/widget/open_container_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +53,8 @@ class HighlightPage extends StatelessWidget {
 }
 
 class HighlightListWidget extends StatelessWidget {
+  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
+
   @override
   Widget build(BuildContext context) {
     return Provider(
@@ -149,50 +155,59 @@ class HighlightListWidget extends StatelessWidget {
 
   List<Widget> setupCarouseList(List<Comic> comis, BuildContext context) {
     return comis
-        .map((item) => Container(
-              margin: EdgeInsets.all(5.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, '/detail/comic_page',
-                      arguments: item);
-                },
-                child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    child: Stack(
-                      children: <Widget>[
-                        Image.network(
-                            'https://www.nae.vn/ttv/ttv/public/images/story/${item.image}.jpg',
-                            fit: BoxFit.cover,
-                            width: double.infinity),
-                        Positioned(
-                          bottom: 0.0,
-                          left: 0.0,
-                          right: 0.0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color.fromARGB(200, 0, 0, 0),
-                                  Color.fromARGB(0, 0, 0, 0)
-                                ],
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
+        .map((item) => OpenContainerWrapper(
+              margin: EdgeInsets.all(5),
+              child: DetailComicPage(
+                comic: item,
+              ),
+              transitionType: _transitionType,
+              closedBuilder: (BuildContext _, VoidCallback openContainer) {
+                return Container(
+                  child: GestureDetector(
+                    onTap: openContainer,
+//                    onTap: () {
+////                  Navigator.pushNamed(context, '/detail/comic_page',
+////                      arguments: item);
+//                    },
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        child: Stack(
+                          children: <Widget>[
+                            Image.network(
+                                'https://www.nae.vn/ttv/ttv/public/images/story/${item.image}.jpg',
+                                fit: BoxFit.cover,
+                                width: double.infinity),
+                            Positioned(
+                              bottom: 0.0,
+                              left: 0.0,
+                              right: 0.0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(200, 0, 0, 0),
+                                      Color.fromARGB(0, 0, 0, 0)
+                                    ],
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                  ),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10.0, horizontal: 20.0),
+                                child: Text(
+                                  item.name,
+                                  style: TvStyle.fontAppWithCustom(
+                                      color: Colors.white,
+                                      size: 17.0,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 20.0),
-                            child: Text(
-                              item.name,
-                              style: TvStyle.fontAppWithCustom(
-                                  color: Colors.white,
-                                  size: 17.0,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )),
-              ),
+                          ],
+                        )),
+                  ),
+                );
+              },
             ))
         .toList();
   }
@@ -275,10 +290,8 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
                 ),
                 InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, '/load_more', arguments: {
-                      'title': title,
-                      'type': type
-                    });
+                    Navigator.pushNamed(context, '/load_more',
+                        arguments: {'title': title, 'type': type});
                   },
                   child: Container(
                     child: Text('Xem Thêm',
@@ -306,7 +319,9 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
                   physics: NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   children: newUpdateList
-                      .map((comic) => ItemGridComic(comic: comic,))
+                      .map((comic) => ItemGridComic(
+                            comic: comic,
+                          ))
                       .toList(),
                 ),
               ),

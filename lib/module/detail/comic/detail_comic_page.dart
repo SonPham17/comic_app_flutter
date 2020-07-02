@@ -13,9 +13,12 @@ import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:provider/provider.dart';
 
 class DetailComicPage extends StatelessWidget {
+  final Comic comic;
+
+  DetailComicPage({this.comic});
+
   @override
   Widget build(BuildContext context) {
-    Comic comic = ModalRoute.of(context).settings.arguments;
     return PageContainer(
       title: comic.name,
       bloc: [],

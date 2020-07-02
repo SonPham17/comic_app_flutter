@@ -1,12 +1,15 @@
+import 'package:animations/animations.dart';
 import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/highlight_service.dart';
 import 'package:comicappflutter/data/repo/highlight_repo.dart';
+import 'package:comicappflutter/module/detail/comic/detail_comic_page.dart';
 import 'package:comicappflutter/module/highlight/highlight_bloc.dart';
 import 'package:comicappflutter/module/highlight/load_more/event/load_more_event.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/model/rest_error.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
+import 'package:comicappflutter/shared/widget/open_container_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +59,7 @@ class LoadMoreGridWidget extends StatefulWidget {
 }
 
 class _LoadMoreGridWidgetState extends State<LoadMoreGridWidget> {
+  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
   Stream<Object> _stream;
   static const double _endReachedThreshold =
       100; // cách bottom 200px thì loadmore
@@ -155,40 +159,41 @@ class _LoadMoreGridWidgetState extends State<LoadMoreGridWidget> {
                           childAspectRatio: 0.5,
                           crossAxisCount: 3,
                           crossAxisSpacing: 5,
-                          mainAxisSpacing: 2,
+                          mainAxisSpacing: 5,
                         ),
                         delegate: SliverChildBuilderDelegate(
-                          (_, index) => Container(
-                            child: Column(
-                              children: <Widget>[
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                        context, '/detail/comic_page',
-                                        arguments: _listDataComic[index]);
-                                  },
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: Image.network(
+                          (_, index) => OpenContainerWrapper(
+                            margin: EdgeInsets.all(1),
+                            transitionType: _transitionType,
+                            closedBuilder:
+                                (BuildContext _, VoidCallback openContainer) {
+                              return InkWell(
+                                onTap: openContainer,
+                                child: Column(
+                                  children: <Widget>[
+                                    Image.network(
                                         'https://www.nae.vn/ttv/ttv/public/images/story/${_listDataComic[index].image}.jpg',
                                         height: 180,
                                         fit: BoxFit.cover),
-                                  ),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                          child: Text(
+                                        _listDataComic[index].name,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TvStyle.fontAppWithSize(12),
+                                        textAlign: TextAlign.center,
+                                      )),
+                                    )
+                                  ],
                                 ),
-                                SizedBox(
-                                  height: 3,
-                                ),
-                                Expanded(
-                                  child: Center(
-                                      child: Text(
-                                    _listDataComic[index].name,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TvStyle.fontAppWithSize(12),
-                                    textAlign: TextAlign.center,
-                                  )),
-                                )
-                              ],
+                              );
+                            },
+                            child: DetailComicPage(
+                              comic: _listDataComic[index],
                             ),
                           ),
                           childCount: _listDataComic.length,
