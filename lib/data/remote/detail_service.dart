@@ -11,4 +11,10 @@ class DetailService {
       },
     );
   }
+
+  Future<Response> getContentChapter(int idChapter) {
+    return ComicClient.instance.dio.get(
+      '/hello_novel/public/api/chapter/$idChapter}/content',
+    );
+  }
 }

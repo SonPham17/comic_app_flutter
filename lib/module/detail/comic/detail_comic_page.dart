@@ -1,11 +1,15 @@
+import 'package:animations/animations.dart';
 import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
+import 'package:comicappflutter/module/detail/chapter/detail_chapter_page.dart';
 import 'package:comicappflutter/module/detail/comic/detail_comic_bloc.dart';
+import 'package:comicappflutter/module/detail/comic/like_comic_event.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/chapter.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
+import 'package:comicappflutter/shared/widget/open_container_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +62,7 @@ class DetailComicListWidget extends StatelessWidget {
               ),
               DetailIntroComicWidget(
                 comic: comic,
+                bloc: bloc,
               ),
               DetailFooterComicWidget(
                 bloc: bloc,
@@ -71,10 +76,22 @@ class DetailComicListWidget extends StatelessWidget {
   }
 }
 
-class DetailIntroComicWidget extends StatelessWidget {
+class DetailIntroComicWidget extends StatefulWidget {
   final Comic comic;
+  final DetailComicBloc bloc;
 
-  DetailIntroComicWidget({this.comic});
+  DetailIntroComicWidget({this.comic, this.bloc});
+
+  @override
+  _DetailIntroComicWidgetState createState() => _DetailIntroComicWidgetState();
+}
+
+class _DetailIntroComicWidgetState extends State<DetailIntroComicWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.bloc.checkComicIsLiked(widget.comic.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,14 +120,32 @@ class DetailIntroComicWidget extends StatelessWidget {
                     color: AppColor.green),
               ),
               Spacer(),
-              Icon(
-                LineAwesomeIcons.heart_o,
-                color: AppColor.green,
+              InkWell(
+                onTap: () {
+                  widget.bloc.isLiked
+                      ? widget.bloc.likeSink.add(false)
+                      : widget.bloc.likeSink.add(true);
+                  widget.bloc.event.add(LikeComicEvent(comic: widget.comic));
+                },
+                child: StreamProvider<bool>.value(
+                    initialData: false,
+                    value: widget.bloc.likeStream,
+                    child: Consumer<bool>(
+                      builder: (context, isLiked, child) => isLiked
+                          ? Icon(
+                              LineAwesomeIcons.heart,
+                              color: AppColor.green,
+                            )
+                          : Icon(
+                              LineAwesomeIcons.heart_o,
+                              color: AppColor.green,
+                            ),
+                    )),
               ),
             ],
           ),
           Text(
-            comic.introduce,
+            widget.comic.introduce,
             style: TvStyle.fontAppWithCustom(),
           ),
         ],
@@ -188,6 +223,8 @@ class DetailFooterComicWidget extends StatefulWidget {
 }
 
 class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
+  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -267,7 +304,11 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
                                           Expanded(
                                             child: InkWell(
                                               onTap: () {
-                                                print(chapter.nameIdChapter);
+                                                Navigator.pushNamed(context,
+                                                    '/detail/chapter_page',
+                                                    arguments: {
+                                                      'id': chapter.id,
+                                                    });
                                               },
                                               child: Column(
                                                 mainAxisAlignment:

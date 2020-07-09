@@ -1,10 +1,13 @@
 import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/bookcase_service.dart';
 import 'package:comicappflutter/data/repo/bookcase_repo.dart';
+import 'package:comicappflutter/module/bookcase/bookcase_bloc.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tabbar/tabbar.dart';
+
+import 'tab_view/bookcase_follow_page.dart';
 
 class BookcasePage extends StatelessWidget {
   final controller = PageController();
@@ -13,7 +16,9 @@ class BookcasePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider.value(value: BookcaseService()),
+        Provider.value(
+          value: BookcaseService(),
+        ),
         ProxyProvider<BookcaseService, BookcaseRepo>(
           update: (context, bookcaseService, _) =>
               BookcaseRepo(bookcaseService: bookcaseService),
@@ -42,13 +47,25 @@ class BookcasePage extends StatelessWidget {
               style: TvStyle.fontApp(),
             ),
           ),
-          body: TabBarView(
-            children: listTab
-                .map((item) => Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Center(child: Text(item.title)),
-                    ))
-                .toList(),
+          body: Provider(
+            create: (context) => BookcaseBloc(
+              bookcaseRepo: Provider.of(context, listen: false),
+            ),
+            child: Consumer<BookcaseBloc>(
+              builder: (_, bloc, child) => TabBarView(
+                children: [
+                  Center(
+                    child: Text('Theo dõi'),
+                  ),
+                  BookcaseFollowPage(
+                    bloc: bloc,
+                  ),
+                  Center(
+                    child: Text('Tải về'),
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ),

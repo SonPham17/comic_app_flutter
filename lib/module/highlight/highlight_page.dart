@@ -165,10 +165,6 @@ class HighlightListWidget extends StatelessWidget {
                 return Container(
                   child: GestureDetector(
                     onTap: openContainer,
-//                    onTap: () {
-////                  Navigator.pushNamed(context, '/detail/comic_page',
-////                      arguments: item);
-//                    },
                     child: ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(5.0)),
                         child: Stack(

@@ -1,5 +1,10 @@
+import 'package:floor/floor.dart';
+
+@entity
 class Comic {
+  @primaryKey
   int id;
+
   String name;
   String introduce;
   String author;
@@ -13,9 +18,9 @@ class Comic {
   int timeFix;
   int convertMonth;
   String tags;
-  dynamic reject;
   int modPassMoney;
   int countNominated;
+  bool isLiked;
 
   Comic({
     this.id,
@@ -32,9 +37,9 @@ class Comic {
     this.timeFix,
     this.convertMonth,
     this.tags,
-    this.reject,
     this.modPassMoney,
     this.countNominated,
+    this.isLiked,
   });
 
   static List<Comic> parseComicList(map) {
@@ -62,9 +67,9 @@ class Comic {
         timeFix: json["time_fix"],
         convertMonth: json["convert_month"],
         tags: json["tags"],
-        reject: json["reject"],
         modPassMoney: json["mod_pass_money"],
         countNominated: json["count_nominated"],
+        isLiked: false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -82,7 +87,6 @@ class Comic {
         "time_fix": timeFix,
         "convert_month": convertMonth,
         "tags": tags,
-        "reject": reject,
         "mod_pass_money": modPassMoney,
         "count_nominated": countNominated,
       };
