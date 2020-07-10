@@ -1,13 +1,15 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:comicappflutter/base/base_widget.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
 import 'package:comicappflutter/module/detail/chapter/detail_chapter_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
+import 'package:comicappflutter/shared/model/background_style.dart';
+import 'package:comicappflutter/shared/model/font_style.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:line_awesome_icons/line_awesome_icons.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 class DetailChapterPage extends StatefulWidget {
@@ -20,6 +22,11 @@ class _DetailChapterPageState extends State<DetailChapterPage>
   AnimationController _controller;
   int idChapter;
   double statusBarHeight;
+
+  double _value = 14;
+  String fontStyle = 'Sriracha';
+  Color backgroundStyleColor = Colors.white;
+  Color textStyleColor = Colors.black;
 
   @override
   void initState() {
@@ -42,9 +49,6 @@ class _DetailChapterPageState extends State<DetailChapterPage>
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-    ));
     return MultiProvider(
       providers: [
         Provider.value(
@@ -59,7 +63,6 @@ class _DetailChapterPageState extends State<DetailChapterPage>
         body: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) => Stack(
-            overflow: Overflow.visible,
             children: <Widget>[
               GestureDetector(
                 onTap: () {
@@ -70,9 +73,13 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                   }
                 },
                 child: Container(
-                  margin: EdgeInsets.only(top: statusBarHeight),
+                  color: backgroundStyleColor,
+                  padding: EdgeInsets.only(top: statusBarHeight),
                   child: ContentChapterWidget(
                     id: idChapter,
+                    sizeText: _value,
+                    fontStyle: fontStyle,
+                    textColor: textStyleColor,
                   ),
                 ),
               ),
@@ -86,18 +93,202 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                     width: double.infinity,
                     margin: EdgeInsets.only(top: statusBarHeight),
                     height: kToolbarHeight,
-                    color: AppColor.green,
-                    child: Center(
-                      child: Text(
-                        idChapter.toString(),
-                        style: TvStyle.fontAppWithCustom(),
-                      ),
-                    ),
+                    color: AppColor.white,
+                    child: _buildToolbar(),
                   ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToolbar() {
+    return Row(
+      children: <Widget>[
+        InkWell(
+          onTap: () {
+            Navigator.pop(context, true);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.close,
+              color: AppColor.green,
+            ),
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            BotToast.showText(text: 'menu');
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.menu,
+              color: AppColor.green,
+            ),
+          ),
+        ),
+        Spacer(),
+        InkWell(
+          onTap: () {
+            showMaterialModalBottomSheet(
+              expand: false,
+              duration: Duration(milliseconds: 300),
+              context: context,
+              builder: (context, scrollController) =>
+                  _buildBottomSheet(scrollController),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.only(right: 15),
+            child: Icon(
+              LineAwesomeIcons.font,
+              color: AppColor.green,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomSheet(ScrollController scrollController) {
+    return StatefulBuilder(
+      builder: (context, setModalState) => Container(
+        height: 170,
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: listBackgroundStyle
+                    .map((item) => InkWell(
+                          onTap: () {
+                            setModalState(
+                              () {
+                                var index = listBackgroundStyle.indexWhere(
+                                    (element) => element.isSelected == true);
+                                listBackgroundStyle[index].isSelected = false;
+                                item.isSelected = true;
+                              },
+                            );
+                            setState(() {
+                              backgroundStyleColor = item.backgroundColor;
+                              textStyleColor = item.textColor;
+                            });
+                          },
+                          child: Icon(
+                            item.iconData,
+                            color:
+                                item.isSelected ? AppColor.green : Colors.black,
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                scrollDirection: Axis.horizontal,
+                children: listFontStyle
+                    .map((item) => InkWell(
+                          onTap: () {
+                            setModalState(
+                              () {
+                                var index = listFontStyle.indexWhere(
+                                    (element) => element.isSelected == true);
+                                listFontStyle[index].isSelected = false;
+                                item.isSelected = true;
+                              },
+                            );
+                            setState(() {
+                              fontStyle = item.name;
+                            });
+                          },
+                          child: Center(
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                item.name,
+                                style: GoogleFonts.getFont(
+                                  item.name,
+                                  fontSize: 15,
+                                  color: item.isSelected
+                                      ? AppColor.green
+                                      : Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.text_fields,
+                    size: 14,
+                  ),
+                  Expanded(
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: Colors.green[700],
+                        inactiveTrackColor: Colors.green[100],
+                        trackShape: RoundedRectSliderTrackShape(),
+                        trackHeight: 4.0,
+                        thumbShape:
+                            RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                        thumbColor: Colors.greenAccent,
+                        overlayColor: Colors.green.withAlpha(32),
+                        overlayShape:
+                            RoundSliderOverlayShape(overlayRadius: 28.0),
+                        tickMarkShape: RoundSliderTickMarkShape(),
+                        activeTickMarkColor: Colors.green[700],
+                        inactiveTickMarkColor: Colors.green[100],
+                        valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+                        valueIndicatorColor: Colors.greenAccent,
+                        valueIndicatorTextStyle: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      child: Slider(
+                        value: _value,
+                        min: 10,
+                        max: 60,
+                        divisions: 100,
+                        label: '$_value',
+                        onChanged: (value) {
+                          setState(() {
+                            print('setState');
+                          });
+                          setModalState(
+                            () {
+                              _value = value;
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.text_fields,
+                    size: 32,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -112,8 +303,12 @@ class _DetailChapterPageState extends State<DetailChapterPage>
 
 class ContentChapterWidget extends StatelessWidget {
   final int id;
+  final double sizeText;
+  final String fontStyle;
+  final Color textColor;
 
-  ContentChapterWidget({this.id});
+  ContentChapterWidget(
+      {this.id, this.sizeText, this.fontStyle, this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +320,9 @@ class ContentChapterWidget extends StatelessWidget {
         builder: (_, bloc, child) => StreamContent(
           detailChapterBloc: bloc,
           id: id,
+          sizeText: sizeText,
+          fontStyle: fontStyle,
+          textColor: textColor,
         ),
       ),
     );
@@ -134,8 +332,16 @@ class ContentChapterWidget extends StatelessWidget {
 class StreamContent extends StatefulWidget {
   final DetailChapterBloc detailChapterBloc;
   final int id;
+  final double sizeText;
+  final String fontStyle;
+  final Color textColor;
 
-  StreamContent({this.detailChapterBloc, this.id});
+  StreamContent(
+      {this.detailChapterBloc,
+      this.id,
+      this.sizeText,
+      this.fontStyle,
+      this.textColor});
 
   @override
   _StreamContentState createState() => _StreamContentState();
@@ -145,12 +351,12 @@ class _StreamContentState extends State<StreamContent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print('load api');
     widget.detailChapterBloc.getContentChapter(widget.id);
   }
 
   @override
   Widget build(BuildContext context) {
+    print('rebuild content');
     return StreamProvider<String>.value(
       value: widget.detailChapterBloc.contentStream,
       initialData: null,
@@ -178,7 +384,15 @@ class _StreamContentState extends State<StreamContent> {
             );
           }
 
-          return SingleChildScrollView(child: Text(content));
+          return SingleChildScrollView(
+              child: Text(
+            content,
+            style: GoogleFonts.getFont(
+              widget.fontStyle,
+              fontSize: widget.sizeText,
+              color: widget.textColor,
+            ),
+          ));
         },
       ),
     );
@@ -191,3 +405,36 @@ class _StreamContentState extends State<StreamContent> {
     widget.detailChapterBloc.dispose();
   }
 }
+
+List<FontStyleModel> listFontStyle = [
+  FontStyleModel(name: 'Sriracha', isSelected: true),
+  FontStyleModel(name: 'Roboto', isSelected: false),
+  FontStyleModel(name: 'Bangers', isSelected: false),
+  FontStyleModel(name: 'Montserrat', isSelected: false),
+  FontStyleModel(name: 'Roboto Mono', isSelected: false),
+  FontStyleModel(name: 'Oswald', isSelected: false),
+  FontStyleModel(name: 'Merriweather', isSelected: false),
+  FontStyleModel(name: 'Playfair Display', isSelected: false),
+  FontStyleModel(name: 'Muli', isSelected: false),
+];
+
+List<BackgroundStyleModel> listBackgroundStyle = [
+  BackgroundStyleModel(
+    iconData: Icons.lightbulb_outline,
+    isSelected: true,
+    textColor: Colors.black,
+    backgroundColor: Colors.white,
+  ),
+  BackgroundStyleModel(
+    iconData: Icons.star_half,
+    isSelected: false,
+    textColor: Colors.black38,
+    backgroundColor: Colors.lightBlue,
+  ),
+  BackgroundStyleModel(
+    iconData: Icons.brightness_2,
+    isSelected: false,
+    textColor: Colors.white,
+    backgroundColor: Colors.black,
+  ),
+];
