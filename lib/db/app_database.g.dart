@@ -60,7 +60,7 @@ class _$AppDatabase extends AppDatabase {
     changeListener = listener ?? StreamController<String>.broadcast();
   }
 
-  ComicDAO _comicDaoInstance;
+  FollowComicDAO _followComicDaoInstance;
 
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
@@ -80,7 +80,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Comic` (`id` INTEGER, `name` TEXT, `introduce` TEXT, `author` TEXT, `idThread` TEXT, `countChapter` INTEGER, `finish` INTEGER, `image` TEXT, `nominatedMonth` INTEGER, `avgRate` REAL, `chinaName` TEXT, `timeFix` INTEGER, `convertMonth` INTEGER, `tags` TEXT, `modPassMoney` INTEGER, `countNominated` INTEGER, `isLiked` INTEGER, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `FollowComic` (`id` INTEGER, `name` TEXT, `introduce` TEXT, `author` TEXT, `idThread` TEXT, `countChapter` INTEGER, `finish` INTEGER, `image` TEXT, `nominatedMonth` INTEGER, `avgRate` REAL, `chinaName` TEXT, `timeFix` INTEGER, `convertMonth` INTEGER, `tags` TEXT, `modPassMoney` INTEGER, `countNominated` INTEGER, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -89,18 +89,19 @@ class _$AppDatabase extends AppDatabase {
   }
 
   @override
-  ComicDAO get comicDao {
-    return _comicDaoInstance ??= _$ComicDAO(database, changeListener);
+  FollowComicDAO get followComicDao {
+    return _followComicDaoInstance ??=
+        _$FollowComicDAO(database, changeListener);
   }
 }
 
-class _$ComicDAO extends ComicDAO {
-  _$ComicDAO(this.database, this.changeListener)
+class _$FollowComicDAO extends FollowComicDAO {
+  _$FollowComicDAO(this.database, this.changeListener)
       : _queryAdapter = QueryAdapter(database),
-        _comicInsertionAdapter = InsertionAdapter(
+        _followComicInsertionAdapter = InsertionAdapter(
             database,
-            'Comic',
-            (Comic item) => <String, dynamic>{
+            'FollowComic',
+            (FollowComic item) => <String, dynamic>{
                   'id': item.id,
                   'name': item.name,
                   'introduce': item.introduce,
@@ -116,15 +117,13 @@ class _$ComicDAO extends ComicDAO {
                   'convertMonth': item.convertMonth,
                   'tags': item.tags,
                   'modPassMoney': item.modPassMoney,
-                  'countNominated': item.countNominated,
-                  'isLiked':
-                      item.isLiked == null ? null : (item.isLiked ? 1 : 0)
+                  'countNominated': item.countNominated
                 }),
-        _comicUpdateAdapter = UpdateAdapter(
+        _followComicUpdateAdapter = UpdateAdapter(
             database,
-            'Comic',
+            'FollowComic',
             ['id'],
-            (Comic item) => <String, dynamic>{
+            (FollowComic item) => <String, dynamic>{
                   'id': item.id,
                   'name': item.name,
                   'introduce': item.introduce,
@@ -140,15 +139,13 @@ class _$ComicDAO extends ComicDAO {
                   'convertMonth': item.convertMonth,
                   'tags': item.tags,
                   'modPassMoney': item.modPassMoney,
-                  'countNominated': item.countNominated,
-                  'isLiked':
-                      item.isLiked == null ? null : (item.isLiked ? 1 : 0)
+                  'countNominated': item.countNominated
                 }),
-        _comicDeletionAdapter = DeletionAdapter(
+        _followComicDeletionAdapter = DeletionAdapter(
             database,
-            'Comic',
+            'FollowComic',
             ['id'],
-            (Comic item) => <String, dynamic>{
+            (FollowComic item) => <String, dynamic>{
                   'id': item.id,
                   'name': item.name,
                   'introduce': item.introduce,
@@ -164,9 +161,7 @@ class _$ComicDAO extends ComicDAO {
                   'convertMonth': item.convertMonth,
                   'tags': item.tags,
                   'modPassMoney': item.modPassMoney,
-                  'countNominated': item.countNominated,
-                  'isLiked':
-                      item.isLiked == null ? null : (item.isLiked ? 1 : 0)
+                  'countNominated': item.countNominated
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -175,7 +170,7 @@ class _$ComicDAO extends ComicDAO {
 
   final QueryAdapter _queryAdapter;
 
-  static final _comicMapper = (Map<String, dynamic> row) => Comic(
+  static final _followComicMapper = (Map<String, dynamic> row) => FollowComic(
       id: row['id'] as int,
       name: row['name'] as String,
       introduce: row['introduce'] as String,
@@ -191,40 +186,40 @@ class _$ComicDAO extends ComicDAO {
       convertMonth: row['convertMonth'] as int,
       tags: row['tags'] as String,
       modPassMoney: row['modPassMoney'] as int,
-      countNominated: row['countNominated'] as int,
-      isLiked: row['isLiked'] == null ? null : (row['isLiked'] as int) != 0);
+      countNominated: row['countNominated'] as int);
 
-  final InsertionAdapter<Comic> _comicInsertionAdapter;
+  final InsertionAdapter<FollowComic> _followComicInsertionAdapter;
 
-  final UpdateAdapter<Comic> _comicUpdateAdapter;
+  final UpdateAdapter<FollowComic> _followComicUpdateAdapter;
 
-  final DeletionAdapter<Comic> _comicDeletionAdapter;
+  final DeletionAdapter<FollowComic> _followComicDeletionAdapter;
 
   @override
-  Future<List<Comic>> getAllComic() async {
-    return _queryAdapter.queryList('SELECT * FROM Comic', mapper: _comicMapper);
+  Future<List<FollowComic>> getAllComic() async {
+    return _queryAdapter.queryList('SELECT * FROM FollowComic',
+        mapper: _followComicMapper);
   }
 
   @override
-  Future<Comic> findComicById(int id) async {
-    return _queryAdapter.query('SELECT * FROM Comic WHERE id = ?',
-        arguments: <dynamic>[id], mapper: _comicMapper);
+  Future<FollowComic> findComicById(int id) async {
+    return _queryAdapter.query('SELECT * FROM FollowComic WHERE id = ?',
+        arguments: <dynamic>[id], mapper: _followComicMapper);
   }
 
   @override
-  Future<int> insertComic(Comic comic) {
-    return _comicInsertionAdapter.insertAndReturnId(
-        comic, OnConflictStrategy.abort);
+  Future<int> insertComic(FollowComic followComic) {
+    return _followComicInsertionAdapter.insertAndReturnId(
+        followComic, OnConflictStrategy.abort);
   }
 
   @override
-  Future<int> updateComic(Comic comic) {
-    return _comicUpdateAdapter.updateAndReturnChangedRows(
-        comic, OnConflictStrategy.abort);
+  Future<int> updateComic(FollowComic followComic) {
+    return _followComicUpdateAdapter.updateAndReturnChangedRows(
+        followComic, OnConflictStrategy.abort);
   }
 
   @override
-  Future<int> deleteComic(Comic comic) {
-    return _comicDeletionAdapter.deleteAndReturnChangedRows(comic);
+  Future<int> deleteComic(FollowComic followComic) {
+    return _followComicDeletionAdapter.deleteAndReturnChangedRows(followComic);
   }
 }

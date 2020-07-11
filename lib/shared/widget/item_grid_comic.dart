@@ -6,10 +6,11 @@ import 'package:comicappflutter/shared/widget/open_container_wrapper.dart';
 import 'package:flutter/material.dart';
 
 class ItemGridComic extends StatelessWidget {
-  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
+  final ContainerTransitionType _transitionType = ContainerTransitionType.fade;
   final Comic comic;
+  final Function(bool) funcClose;
 
-  ItemGridComic({@required this.comic});
+  ItemGridComic({@required this.comic,this.funcClose});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,8 @@ class ItemGridComic extends StatelessWidget {
       child: DetailComicPage(
         comic: comic,
       ),
-      closedBuilder: (BuildContext context, VoidCallback openContainer){
+      onClosed: funcClose,
+      closedBuilder: (BuildContext context, VoidCallback openContainer) {
         return Container(
           child: Column(
             children: <Widget>[
@@ -35,12 +37,12 @@ class ItemGridComic extends StatelessWidget {
               Expanded(
                 child: Center(
                     child: Text(
-                      comic.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TvStyle.fontAppWithSize(12),
-                      textAlign: TextAlign.center,
-                    )),
+                  comic.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TvStyle.fontAppWithSize(12),
+                  textAlign: TextAlign.center,
+                )),
               )
             ],
           ),

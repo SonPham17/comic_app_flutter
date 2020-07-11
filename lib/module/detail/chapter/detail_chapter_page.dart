@@ -27,6 +27,7 @@ class _DetailChapterPageState extends State<DetailChapterPage>
   String fontStyle = 'Sriracha';
   Color backgroundStyleColor = Colors.white;
   Color textStyleColor = Colors.black;
+  double widthScreen;
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _DetailChapterPageState extends State<DetailChapterPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    widthScreen = (MediaQuery.of(context).size.width) / 9;
     var arguments = ModalRoute.of(context).settings.arguments as Map;
     if (arguments != null) {
       idChapter = arguments['id'];
@@ -74,27 +76,82 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                 },
                 child: Container(
                   color: backgroundStyleColor,
-                  padding: EdgeInsets.only(top: statusBarHeight),
+                  padding:
+                      EdgeInsets.only(top: statusBarHeight, left: 5, right: 5),
                   child: ContentChapterWidget(
                     id: idChapter,
                     sizeText: _value,
                     fontStyle: fontStyle,
                     textColor: textStyleColor,
+                    backgroundStyleColor: backgroundStyleColor,
                   ),
                 ),
               ),
               Transform.translate(
                 offset: Offset(0, -_controller.value * 100),
-                child: GestureDetector(
-                  onTap: () {
-                    print('appbar');
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(top: statusBarHeight),
-                    height: kToolbarHeight,
-                    color: AppColor.white,
-                    child: _buildToolbar(),
+                child: Container(
+                  margin: EdgeInsets.only(top: statusBarHeight+10, left: widthScreen),
+                  height: widthScreen,
+                  width: widthScreen,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.green,
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context, true);
+                    },
+                    child: Icon(
+                      Icons.close,
+                      color: AppColor.white,
+                    ),
+                  ),
+                ),
+              ),
+              Transform.translate(
+                offset: Offset(0, -_controller.value * 100),
+                child: Container(
+                  margin: EdgeInsets.only(top: statusBarHeight+10, left: widthScreen*4),
+                  height: widthScreen,
+                  width: widthScreen,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.green,
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      BotToast.showText(text: 'menu');
+                    },
+                    child: Icon(
+                      Icons.menu,
+                      color: AppColor.white,
+                    ),
+                  ),
+                ),
+              ),
+              Transform.translate(
+                offset: Offset(0, -_controller.value * 100),
+                child: Container(
+                  margin: EdgeInsets.only(top: statusBarHeight+10, left: widthScreen*7),
+                  height: widthScreen,
+                  width: widthScreen,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.green,
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      showMaterialModalBottomSheet(
+                        duration: Duration(milliseconds: 300),
+                        context: context,
+                        builder: (context, scrollController) =>
+                            _buildBottomSheet(scrollController),
+                      );
+                    },
+                    child: Icon(
+                      LineAwesomeIcons.font,
+                      color: AppColor.white,
+                    ),
                   ),
                 ),
               ),
@@ -102,56 +159,6 @@ class _DetailChapterPageState extends State<DetailChapterPage>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildToolbar() {
-    return Row(
-      children: <Widget>[
-        InkWell(
-          onTap: () {
-            Navigator.pop(context, true);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.close,
-              color: AppColor.green,
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () {
-            BotToast.showText(text: 'menu');
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.menu,
-              color: AppColor.green,
-            ),
-          ),
-        ),
-        Spacer(),
-        InkWell(
-          onTap: () {
-            showMaterialModalBottomSheet(
-              expand: false,
-              duration: Duration(milliseconds: 300),
-              context: context,
-              builder: (context, scrollController) =>
-                  _buildBottomSheet(scrollController),
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.only(right: 15),
-            child: Icon(
-              LineAwesomeIcons.font,
-              color: AppColor.green,
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -306,9 +313,15 @@ class ContentChapterWidget extends StatelessWidget {
   final double sizeText;
   final String fontStyle;
   final Color textColor;
+  final Color backgroundStyleColor;
 
-  ContentChapterWidget(
-      {this.id, this.sizeText, this.fontStyle, this.textColor});
+  ContentChapterWidget({
+    this.id,
+    this.sizeText,
+    this.fontStyle,
+    this.textColor,
+    this.backgroundStyleColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -323,6 +336,7 @@ class ContentChapterWidget extends StatelessWidget {
           sizeText: sizeText,
           fontStyle: fontStyle,
           textColor: textColor,
+          backgroundStyleColor: backgroundStyleColor,
         ),
       ),
     );
@@ -335,13 +349,16 @@ class StreamContent extends StatefulWidget {
   final double sizeText;
   final String fontStyle;
   final Color textColor;
+  final Color backgroundStyleColor;
 
-  StreamContent(
-      {this.detailChapterBloc,
-      this.id,
-      this.sizeText,
-      this.fontStyle,
-      this.textColor});
+  StreamContent({
+    this.detailChapterBloc,
+    this.id,
+    this.sizeText,
+    this.fontStyle,
+    this.textColor,
+    this.backgroundStyleColor,
+  });
 
   @override
   _StreamContentState createState() => _StreamContentState();
@@ -385,14 +402,18 @@ class _StreamContentState extends State<StreamContent> {
           }
 
           return SingleChildScrollView(
+            child: Container(
+              color: widget.backgroundStyleColor,
               child: Text(
-            content,
-            style: GoogleFonts.getFont(
-              widget.fontStyle,
-              fontSize: widget.sizeText,
-              color: widget.textColor,
+                content,
+                style: GoogleFonts.getFont(
+                  widget.fontStyle,
+                  fontSize: widget.sizeText,
+                  color: widget.textColor,
+                ),
+              ),
             ),
-          ));
+          );
         },
       ),
     );
