@@ -17,7 +17,7 @@ class BookcaseRepo {
         await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
     try {
       var listComicInDB = await database.followComicDao.getAllComic();
-      c.complete(listComicInDB);
+      c.complete(Comic.parseComicListByFollow(listComicInDB));
     } catch (e) {
 
     }

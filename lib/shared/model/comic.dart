@@ -1,3 +1,4 @@
+import 'package:comicappflutter/db/model/follow.dart';
 import 'package:floor/floor.dart';
 
 class Comic {
@@ -48,6 +49,11 @@ class Comic {
     return list.map((product) => Comic.fromJson(product)).toList();
   }
 
+  static List<Comic> parseComicListByFollow(listFollow){
+    var list = listFollow as List;
+    return list.map((followComic) => Comic.convertFollowToComic(followComic)).toList();
+  }
+
   factory Comic.fromJson(Map<String, dynamic> json) => Comic(
         id: json["id"],
         name: json["name"],
@@ -65,6 +71,25 @@ class Comic {
         tags: json["tags"],
         modPassMoney: json["mod_pass_money"],
         countNominated: json["count_nominated"],
+      );
+
+  factory Comic.convertFollowToComic(FollowComic followComic) => Comic(
+        id: followComic.id,
+        name: followComic.name,
+        introduce: followComic.introduce,
+        author: followComic.author,
+        idThread: followComic.idThread,
+        countChapter: followComic.countChapter,
+        finish: followComic.finish,
+        image: followComic.image,
+        nominatedMonth: followComic.nominatedMonth,
+        avgRate: followComic.avgRate,
+        chinaName: followComic.chinaName,
+        timeFix: followComic.timeFix,
+        convertMonth: followComic.convertMonth,
+        tags: followComic.tags,
+        modPassMoney: followComic.modPassMoney,
+        countNominated: followComic.countNominated,
       );
 
   Map<String, dynamic> toJson() => {

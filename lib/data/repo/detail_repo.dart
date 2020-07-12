@@ -1,6 +1,7 @@
 import 'dart:isolate';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/db/app_database.dart';
+import 'package:comicappflutter/db/model/follow.dart';
 import 'package:comicappflutter/shared/model/chapter.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/model/rest_error.dart';
@@ -40,9 +41,9 @@ class DetailRepo {
     try {
       var response = await _detailService.getContentChapter(idChapter);
       var contentChapter = response.data['content_chapter'] as List;
-      if(contentChapter.length == 0){
+      if (contentChapter.length == 0) {
         c.complete('');
-      }else{
+      } else {
         c.complete(contentChapter[0]['content']);
       }
     } on DioError {
@@ -58,7 +59,8 @@ class DetailRepo {
     final database =
         await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
     try {
-      var result = await database.comicDao.deleteComic(comic);
+      var result = await database.followComicDao
+          .deleteComic(FollowComic.convertComicToFollow(comic));
       if (result == 0) {
         c.complete(false);
       } else {
@@ -71,9 +73,10 @@ class DetailRepo {
   Future<bool> insertLikeComic(Comic comic) async {
     var c = Completer<bool>();
     final database =
-    await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
     try {
-      var result = await database.comicDao.insertComic(comic);
+      var result = await database.followComicDao
+          .insertComic(FollowComic.convertComicToFollow(comic));
       if (result == 0) {
         c.complete(false);
       } else {
@@ -83,14 +86,21 @@ class DetailRepo {
     return c.future;
   }
 
-  Future<Comic> findComicInDB(int id) async {
+  Future<Comic> findComicFollowInDB(int id) async {
+    print('id= $id');
     var c = Completer<Comic>();
     final database =
-    await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
     try {
-      var comic = await database.comicDao.findComicById(id);
-      c.complete(comic);
-    } catch (e) {}
+      var followComic = await database.followComicDao.findComicById(id);
+      if (followComic == null) {
+        c.complete(null);
+      } else {
+        c.complete(Comic.convertFollowToComic(followComic));
+      }
+    } catch (e) {
+      print('Loi nay $e');
+    }
     return c.future;
   }
 

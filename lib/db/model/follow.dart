@@ -1,3 +1,4 @@
+import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:floor/floor.dart';
 
 @entity
@@ -39,4 +40,23 @@ class FollowComic{
     this.modPassMoney,
     this.countNominated,
   });
+
+  factory FollowComic.convertComicToFollow(Comic comic) => FollowComic(
+    id: comic.id,
+    name: comic.name,
+    introduce: comic.introduce,
+    author: comic.author,
+    idThread: comic.idThread,
+    countChapter: comic.countChapter,
+    finish: comic.finish,
+    image: comic.image,
+    nominatedMonth: comic.nominatedMonth,
+    avgRate: comic.avgRate,
+    chinaName: comic.chinaName,
+    timeFix: comic.timeFix,
+    convertMonth: comic.convertMonth,
+    tags: comic.tags,
+    modPassMoney: comic.modPassMoney,
+    countNominated: comic.countNominated,
+  );
 }

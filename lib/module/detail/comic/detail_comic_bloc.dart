@@ -24,7 +24,6 @@ class DetailComicBloc extends BaseBloc {
   Sink<bool> get likeSink => _likeSubject.sink;
 
   bool _isLiked;
-
   bool get isLiked => _isLiked;
 
   DetailComicBloc({DetailRepo detailRepo}) : _detailRepo = detailRepo;
@@ -55,16 +54,19 @@ class DetailComicBloc extends BaseBloc {
     }
   }
 
-  void checkComicIsLiked(int idComic) async {
-    _detailRepo.findComicInDB(idComic).then((comic) {
+  void checkComicIsLiked(int idComic){
+    _detailRepo.findComicFollowInDB(idComic).then((comic) {
       if (comic != null) {
         likeSink.add(true);
+        print('comic khac null');
         _isLiked = true;
       } else {
         likeSink.add(false);
+        print('comic bang null');
         _isLiked = false;
       }
     });
+    print('comic check');
   }
 
   @override
