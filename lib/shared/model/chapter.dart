@@ -1,3 +1,5 @@
+import 'package:comicappflutter/db/model/chapter.dart';
+
 class Chapter{
   int id;
   int chapterId;
@@ -33,8 +35,24 @@ class Chapter{
     updatedAt: json["updated_at"],
   );
 
+  factory Chapter.fromDB(ChapterComic chapterComic) => Chapter(
+    id: chapterComic.idChapter,
+    chapterId: chapterComic.idChapter,
+    nameIdChapter: chapterComic.nameIdChapter,
+    url: '',
+    contentTitleOfChapter: chapterComic.contentTitleOfChapter,
+    vol: chapterComic.vol,
+    storyId: 1,
+    createdAt: chapterComic.createdAt,
+    updatedAt: chapterComic.updatedAt,
+  );
+
   static List<Chapter> parseChaptersList(map) {
     var list = map['chapters'] as List;
     return list.map((chapter) => Chapter.fromJson(chapter)).toList();
+  }
+
+  static List<Chapter> parseChaptersListFromDB(List<ChapterComic> data) {
+    return data.map((chapter) => Chapter.fromDB(chapter)).toList();
   }
 }

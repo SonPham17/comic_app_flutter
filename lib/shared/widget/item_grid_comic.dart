@@ -8,9 +8,10 @@ import 'package:flutter/material.dart';
 class ItemGridComic extends StatelessWidget {
   final ContainerTransitionType _transitionType = ContainerTransitionType.fade;
   final Comic comic;
+  final bool isOpenDownload;
   final Function(bool) funcClose;
 
-  ItemGridComic({@required this.comic,this.funcClose});
+  ItemGridComic({@required this.comic,this.funcClose,this.isOpenDownload});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +19,7 @@ class ItemGridComic extends StatelessWidget {
       transitionType: _transitionType,
       child: DetailComicPage(
         comic: comic,
+        isOpenDownload: isOpenDownload,
       ),
       onClosed: funcClose,
       closedBuilder: (BuildContext context, VoidCallback openContainer) {

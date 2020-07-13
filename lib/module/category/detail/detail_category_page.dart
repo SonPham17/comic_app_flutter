@@ -175,6 +175,7 @@ class _DetailCategoryGridWidgetState extends State<DetailCategoryGridWidget> {
                           },
                           child: DetailComicPage(
                             comic: _listDataComic[index],
+                            isOpenDownload: false,
                           ),
                         ),
                         childCount: _listDataComic.length,

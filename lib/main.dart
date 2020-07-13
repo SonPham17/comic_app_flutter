@@ -6,6 +6,7 @@ import 'package:comicappflutter/module/search/search_page.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'module/detail/chapter/detail_chapter_db_page.dart';
 import 'module/highlight/load_more/load_more_page.dart';
 import 'module/splash/splash.dart';
 import 'module/home/home_page.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/detail/comic_page': (context) => DetailComicPage(),
         '/detail/category_page': (context) => DetailCategoryPage(),
         '/detail/chapter_page': (context) => DetailChapterPage(),
+        '/detail/chapter_db_page': (context) => DetailChapterDBPage(),
         '/load_more': (context) => LoadMorePage(),
         '/search': (context) => SearchPage(),
       },

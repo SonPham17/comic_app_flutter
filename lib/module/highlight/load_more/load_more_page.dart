@@ -194,6 +194,7 @@ class _LoadMoreGridWidgetState extends State<LoadMoreGridWidget> {
                             },
                             child: DetailComicPage(
                               comic: _listDataComic[index],
+                              isOpenDownload: false,
                             ),
                           ),
                           childCount: _listDataComic.length,

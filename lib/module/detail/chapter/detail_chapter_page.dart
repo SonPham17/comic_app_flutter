@@ -1,16 +1,23 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
 import 'package:comicappflutter/module/detail/chapter/detail_chapter_bloc.dart';
+import 'package:comicappflutter/module/detail/chapter/download_comic_event.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/background_style.dart';
+import 'package:comicappflutter/shared/model/chapter.dart';
+import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/model/font_style.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
+import 'package:comicappflutter/shared/widget/bloc_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+
+import 'download_finish_comic_event.dart';
 
 class DetailChapterPage extends StatefulWidget {
   @override
@@ -21,6 +28,8 @@ class _DetailChapterPageState extends State<DetailChapterPage>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   int idChapter;
+  Comic comic;
+  Chapter chapter;
   double statusBarHeight;
 
   double _value = 14;
@@ -45,6 +54,8 @@ class _DetailChapterPageState extends State<DetailChapterPage>
     var arguments = ModalRoute.of(context).settings.arguments as Map;
     if (arguments != null) {
       idChapter = arguments['id'];
+      comic = arguments['comic'];
+      chapter = arguments['chapter'];
     }
     statusBarHeight = MediaQuery.of(context).padding.top;
   }
@@ -62,104 +73,150 @@ class _DetailChapterPageState extends State<DetailChapterPage>
         ),
       ],
       child: Scaffold(
-        body: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) => Stack(
-            children: <Widget>[
-              GestureDetector(
-                onTap: () {
-                  if (_controller.isCompleted) {
-                    _controller.reverse();
-                  } else {
-                    _controller.forward();
-                  }
-                },
-                child: Container(
-                  color: backgroundStyleColor,
-                  padding:
-                      EdgeInsets.only(top: statusBarHeight, left: 5, right: 5),
-                  child: ContentChapterWidget(
-                    id: idChapter,
-                    sizeText: _value,
-                    fontStyle: fontStyle,
-                    textColor: textStyleColor,
-                    backgroundStyleColor: backgroundStyleColor,
-                  ),
-                ),
-              ),
-              Transform.translate(
-                offset: Offset(0, -_controller.value * 100),
-                child: Container(
-                  margin: EdgeInsets.only(top: statusBarHeight+10, left: widthScreen),
-                  height: widthScreen,
-                  width: widthScreen,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColor.green,
-                  ),
-                  child: InkWell(
+        body: Provider(
+          create: (context) => DetailChapterBloc(
+            detailRepo: Provider.of(
+              context,
+              listen: false,
+            ),
+          ),
+          child: Consumer<DetailChapterBloc>(
+            builder: (_, bloc, child) => AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) => Stack(
+                children: <Widget>[
+                  GestureDetector(
                     onTap: () {
-                      Navigator.pop(context, true);
+                      if (_controller.isCompleted) {
+                        _controller.reverse();
+                      } else {
+                        _controller.forward();
+                      }
                     },
-                    child: Icon(
-                      Icons.close,
-                      color: AppColor.white,
+                    child: Container(
+                      color: backgroundStyleColor,
+                      padding: EdgeInsets.only(
+                          top: statusBarHeight, left: 5, right: 5),
+                      child: ContentChapterWidget(
+                        id: idChapter,
+                        sizeText: _value,
+                        fontStyle: fontStyle,
+                        textColor: textStyleColor,
+                        backgroundStyleColor: backgroundStyleColor,
+                        detailChapterBloc: bloc,
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Transform.translate(
-                offset: Offset(0, -_controller.value * 100),
-                child: Container(
-                  margin: EdgeInsets.only(top: statusBarHeight+10, left: widthScreen*4),
-                  height: widthScreen,
-                  width: widthScreen,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColor.green,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      BotToast.showText(text: 'menu');
-                    },
-                    child: Icon(
-                      Icons.menu,
-                      color: AppColor.white,
+                  Transform.translate(
+                    offset: Offset(0, -_controller.value * 100),
+                    child: Container(
+                      margin: EdgeInsets.only(
+                          top: statusBarHeight + 10, left: widthScreen),
+                      height: widthScreen,
+                      width: widthScreen,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColor.green,
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: Icon(
+                          Icons.close,
+                          color: AppColor.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Transform.translate(
-                offset: Offset(0, -_controller.value * 100),
-                child: Container(
-                  margin: EdgeInsets.only(top: statusBarHeight+10, left: widthScreen*7),
-                  height: widthScreen,
-                  width: widthScreen,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColor.green,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      showMaterialModalBottomSheet(
-                        duration: Duration(milliseconds: 300),
-                        context: context,
-                        builder: (context, scrollController) =>
-                            _buildBottomSheet(scrollController),
-                      );
-                    },
-                    child: Icon(
-                      LineAwesomeIcons.font,
-                      color: AppColor.white,
+                  BlocListener<DetailChapterBloc>(
+                    listener: handleEvent,
+                    child: Transform.translate(
+                      offset: Offset(0, -_controller.value * 100),
+                      child: Container(
+                        margin: EdgeInsets.only(
+                            top: statusBarHeight + 10, left: widthScreen * 4),
+                        height: widthScreen,
+                        width: widthScreen,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColor.green,
+                        ),
+                        child: StreamProvider<bool>.value(
+                          value: bloc.chapterIsExistStream,
+                          initialData: true,
+                          child: Consumer<bool>(
+                            builder: (_, isExist, child) {
+                              if (isExist) {
+                                return FloatingActionButton(
+                                  backgroundColor: Colors.black38,
+                                  onPressed: null,
+                                  child: Icon(
+                                    LineAwesomeIcons.cloud_download,
+                                    color: AppColor.white,
+                                  ),
+                                );
+                              } else {
+                                return FloatingActionButton(
+                                  backgroundColor: AppColor.green,
+                                  onPressed: () {
+                                    bloc.event.add(DownloadComicEvent(
+                                      comic: comic,
+                                      chapter: chapter,
+                                    ));
+                                  },
+                                  child: Icon(
+                                    LineAwesomeIcons.cloud_download,
+                                    color: AppColor.white,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Transform.translate(
+                    offset: Offset(0, -_controller.value * 100),
+                    child: Container(
+                      margin: EdgeInsets.only(
+                          top: statusBarHeight + 10, left: widthScreen * 7),
+                      height: widthScreen,
+                      width: widthScreen,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColor.green,
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          showMaterialModalBottomSheet(
+                            duration: Duration(milliseconds: 300),
+                            context: context,
+                            builder: (context, scrollController) =>
+                                _buildBottomSheet(scrollController),
+                          );
+                        },
+                        child: Icon(
+                          LineAwesomeIcons.font,
+                          color: AppColor.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  handleEvent(BaseEvent event) {
+    if (event is DownloadFinishComicEvent) {
+      BotToast.showText(text: event.msg);
+    }
   }
 
   Widget _buildBottomSheet(ScrollController scrollController) {
@@ -314,6 +371,7 @@ class ContentChapterWidget extends StatelessWidget {
   final String fontStyle;
   final Color textColor;
   final Color backgroundStyleColor;
+  final DetailChapterBloc detailChapterBloc;
 
   ContentChapterWidget({
     this.id,
@@ -321,24 +379,18 @@ class ContentChapterWidget extends StatelessWidget {
     this.fontStyle,
     this.textColor,
     this.backgroundStyleColor,
+    this.detailChapterBloc,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      create: (context) => DetailChapterBloc(
-        detailRepo: Provider.of(context, listen: false),
-      ),
-      child: Consumer<DetailChapterBloc>(
-        builder: (_, bloc, child) => StreamContent(
-          detailChapterBloc: bloc,
-          id: id,
-          sizeText: sizeText,
-          fontStyle: fontStyle,
-          textColor: textColor,
-          backgroundStyleColor: backgroundStyleColor,
-        ),
-      ),
+    return StreamContent(
+      detailChapterBloc: detailChapterBloc,
+      id: id,
+      sizeText: sizeText,
+      fontStyle: fontStyle,
+      textColor: textColor,
+      backgroundStyleColor: backgroundStyleColor,
     );
   }
 }

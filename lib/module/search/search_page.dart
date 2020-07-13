@@ -151,6 +151,7 @@ class _SearchListWidgetState extends State<SearchListWidget> {
                             childAspectRatio: 0.5,
                             children: listDataSearch
                                 .map((comic) => ItemGridComic(
+                              isOpenDownload: false,
                                       comic: comic,
                                     ))
                                 .toList(),

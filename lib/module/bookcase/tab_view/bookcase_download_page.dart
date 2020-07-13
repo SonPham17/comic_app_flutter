@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:comicappflutter/module/bookcase/bookcase_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
@@ -8,26 +6,27 @@ import 'package:comicappflutter/shared/widget/item_grid_comic.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BookcaseFollowPage extends StatefulWidget {
+class BookcaseDownloadPage extends StatefulWidget {
   final BookcaseBloc bloc;
 
-  BookcaseFollowPage({this.bloc});
+  BookcaseDownloadPage({this.bloc});
 
   @override
-  _BookcaseFollowPageState createState() => _BookcaseFollowPageState();
+  _BookcaseDownloadPageState createState() => _BookcaseDownloadPageState();
 }
 
-class _BookcaseFollowPageState extends State<BookcaseFollowPage> {
+class _BookcaseDownloadPageState extends State<BookcaseDownloadPage> {
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    widget.bloc.getListComicFollowInDB();
+    widget.bloc.getListComicDownloadInDB();
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamProvider<List<Comic>>.value(
-      value: widget.bloc.bookcaseFollowStream,
+      value: widget.bloc.bookcaseDownloadStream,
       initialData: null,
       child: Consumer<List<Comic>>(
         builder: (_, data, child) {
@@ -69,12 +68,12 @@ class _BookcaseFollowPageState extends State<BookcaseFollowPage> {
                 shrinkWrap: true,
                 children: data
                     .map((comic) => ItemGridComic(
-                          comic: comic,
-                          isOpenDownload: false,
-                          funcClose: (isClose){
-                            widget.bloc.getListComicFollowInDB();
-                          },
-                        ))
+                  isOpenDownload: true,
+                  comic: comic,
+                  funcClose: (isClose){
+                    widget.bloc.getListComicDownloadInDB();
+                  },
+                ))
                     .toList(),
               ),
             ),
@@ -83,5 +82,4 @@ class _BookcaseFollowPageState extends State<BookcaseFollowPage> {
       ),
     );
   }
-
 }

@@ -8,14 +8,14 @@ abstract class FollowComicDAO{
   Future<List<FollowComic>> getAllComic();
 
   @insert
-  Future<int> insertComic(FollowComic followComic);
+  Future<void> insertComic(FollowComic followComic);
 
   @update
-  Future<int> updateComic(FollowComic followComic);
+  Future<void> updateComic(FollowComic followComic);
 
   @Query('SELECT * FROM FollowComic WHERE id = :id')
   Future<FollowComic> findComicById(int id);
 
   @delete
-  Future<int> deleteComic(FollowComic followComic);
+  Future<void> deleteComic(FollowComic followComic);
 }

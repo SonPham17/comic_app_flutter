@@ -14,12 +14,38 @@ class BookcaseRepo {
   Future<List<Comic>> getListComicFollowInDB() async {
     var c = Completer<List<Comic>>();
     final database =
-        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
     try {
       var listComicInDB = await database.followComicDao.getAllComic();
       c.complete(Comic.parseComicListByFollow(listComicInDB));
     } catch (e) {
 
+    }
+    return c.future;
+  }
+
+  Future<List<Comic>> getListComicHistoryInDB() async {
+    var c = Completer<List<Comic>>();
+    final database =
+    await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    try {
+      var listComicInDB = await database.historyComicDao.getAllComic();
+      c.complete(Comic.parseComicListByHistory(listComicInDB));
+    } catch (e) {
+      print('loi history $e');
+    }
+    return c.future;
+  }
+
+  Future<List<Comic>> getListComicDownloadInDB() async {
+    var c = Completer<List<Comic>>();
+    final database =
+    await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    try {
+      var listComicInDB = await database.downloadComicDao.getAllComic();
+      c.complete(Comic.parseComicListByDownload(listComicInDB));
+    } catch (e) {
+      print('loi donwload $e');
     }
     return c.future;
   }

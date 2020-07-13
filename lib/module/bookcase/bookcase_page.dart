@@ -1,11 +1,11 @@
-import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/bookcase_service.dart';
 import 'package:comicappflutter/data/repo/bookcase_repo.dart';
 import 'package:comicappflutter/module/bookcase/bookcase_bloc.dart';
+import 'package:comicappflutter/module/bookcase/tab_view/bookcase_download_page.dart';
+import 'package:comicappflutter/module/bookcase/tab_view/bookcase_history_page.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tabbar/tabbar.dart';
 
 import 'tab_view/bookcase_follow_page.dart';
 
@@ -54,15 +54,15 @@ class BookcasePage extends StatelessWidget {
             child: Consumer<BookcaseBloc>(
               builder: (_, bloc, child) => TabBarView(
                 children: [
-                  Center(
-                    child: Text('Theo dõi'),
+                  BookcaseHistoryPage(
+                    bloc: bloc,
                   ),
                   BookcaseFollowPage(
                     bloc: bloc,
                   ),
-                  Center(
-                    child: Text('Tải về'),
-                  )
+                  BookcaseDownloadPage(
+                    bloc: bloc,
+                  ),
                 ],
               ),
             ),

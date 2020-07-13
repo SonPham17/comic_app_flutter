@@ -18,6 +18,7 @@ class SearchRepo {
       var searchList = Comic.parseComicListBySearch(response.data);
       c.complete(searchList);
     } on DioError {
+      print('dio error');
       c.completeError(RestError.fromData('Không có dữ liệu'));
     } catch (e) {
       c.completeError(e);

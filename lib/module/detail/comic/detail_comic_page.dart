@@ -2,14 +2,15 @@ import 'package:animations/animations.dart';
 import 'package:comicappflutter/base/base_widget.dart';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
-import 'package:comicappflutter/module/detail/chapter/detail_chapter_page.dart';
+import 'package:comicappflutter/db/model/chapter.dart';
 import 'package:comicappflutter/module/detail/comic/detail_comic_bloc.dart';
+import 'file:///F:/Flutter/comic_app_flutter/comic_app_flutter/lib/module/detail/chapter/download_comic_event.dart';
+import 'package:comicappflutter/module/detail/comic/history_comic_event.dart';
 import 'package:comicappflutter/module/detail/comic/like_comic_event.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/chapter.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
-import 'package:comicappflutter/shared/widget/open_container_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +19,9 @@ import 'package:provider/provider.dart';
 
 class DetailComicPage extends StatelessWidget {
   final Comic comic;
+  final bool isOpenDownload;
 
-  DetailComicPage({this.comic});
+  DetailComicPage({this.comic, this.isOpenDownload});
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class DetailComicPage extends StatelessWidget {
       ],
       child: DetailComicListWidget(
         comic: comic,
+        isOpenDownload: isOpenDownload,
       ),
     );
   }
@@ -44,8 +47,9 @@ class DetailComicPage extends StatelessWidget {
 
 class DetailComicListWidget extends StatelessWidget {
   final Comic comic;
+  final bool isOpenDownload;
 
-  DetailComicListWidget({this.comic});
+  DetailComicListWidget({this.comic, this.isOpenDownload});
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +71,7 @@ class DetailComicListWidget extends StatelessWidget {
               DetailFooterComicWidget(
                 bloc: bloc,
                 comic: comic,
+                isOpenDownload: isOpenDownload,
               ),
             ],
           ),
@@ -214,8 +219,9 @@ class DetailHeaderComicWidget extends StatelessWidget {
 class DetailFooterComicWidget extends StatefulWidget {
   final Comic comic;
   final DetailComicBloc bloc;
+  final bool isOpenDownload;
 
-  const DetailFooterComicWidget({this.comic, this.bloc});
+  const DetailFooterComicWidget({this.comic, this.bloc, this.isOpenDownload});
 
   @override
   _DetailFooterComicWidgetState createState() =>
@@ -229,7 +235,11 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     print('didChangeDependencies');
-    widget.bloc.getChaptersList(widget.comic.id);
+    if (widget.isOpenDownload) {
+      widget.bloc.getChaptersListInDB(widget.comic.id);
+    } else {
+      widget.bloc.getChaptersList(widget.comic.id);
+    }
   }
 
   @override
@@ -269,45 +279,88 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
             height: 1,
             color: Colors.black12,
           ),
-          Container(
-            child: StreamProvider<List<List<Chapter>>>.value(
-              value: widget.bloc.chaptersStream,
-              child: Consumer<List<List<Chapter>>>(
-                builder: (context, data, child) {
-                  if (data != null) {
-                    if (data.length == 0) {
-                      return Container(
-                        height: 170,
-                        child: Center(
-                          child: Text('Chưa có dữ liệu về truyện này',
-                              style: TvStyle.fontAppWithCustom()),
-                        ),
-                      );
-                    }
+          widget.isOpenDownload
+              ? StreamProvider<List<ChapterComic>>.value(
+                  value: widget.bloc.chaptersInDBStream,
+                  child: Consumer<List<ChapterComic>>(
+                    builder: (context, data, child) {
+                      if (data == null) {
+                        return Container(
+                          height: 170,
+                          child: Center(
+                            child: Text('Chưa có dữ liệu về truyện này',
+                                style: TvStyle.fontAppWithCustom()),
+                          ),
+                        );
+                      }
 
-                    if (data.length != 0) {
-                      return ListView.builder(
+                      var listChapter = Chapter.parseChaptersListFromDB(data);
+                      return ListView(
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemBuilder: (context, index) => ExpansionTile(
-                          title: Text(
-                            'Phần ${index + 1}',
-                            style: TvStyle.fontAppWithCustom(size: 18),
-                          ),
-                          children: <Widget>[
-                            Column(
-                              children: data[index]
-                                  .map(
-                                    (chapter) => Container(
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
+                        children: ListTile.divideTiles(
+                            color: Colors.black38,
+                            tiles: listChapter.map((chapter) => InkWell(
+                                  onTap: () {
+                                    Navigator.pushNamed(context,
+                                        '/detail/chapter_db_page',
+                                        arguments: {
+                                          'content': data[listChapter.indexOf(chapter)].content,
+                                        });
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    child: Text(
+                                      'Phần ${chapter.vol} - ${chapter.nameIdChapter}: ${chapter.contentTitleOfChapter}',
+                                      style: TvStyle.fontAppWithCustom(size: 16),
+                                    ),
+                                  ),
+                                ))).toList(),
+                      );
+                    },
+                  ),
+                )
+              : Container(
+                  child: StreamProvider<List<List<Chapter>>>.value(
+                    value: widget.bloc.chaptersStream,
+                    child: Consumer<List<List<Chapter>>>(
+                      builder: (context, data, child) {
+                        if (data != null) {
+                          if (data.length == 0) {
+                            return Container(
+                              height: 170,
+                              child: Center(
+                                child: Text('Chưa có dữ liệu về truyện này',
+                                    style: TvStyle.fontAppWithCustom()),
+                              ),
+                            );
+                          }
+
+                          if (data.length != 0) {
+                            return ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) => ExpansionTile(
+                                title: Text(
+                                  'Phần ${index + 1}',
+                                  style: TvStyle.fontAppWithCustom(size: 18),
+                                ),
+                                children: <Widget>[
+                                  Column(
+                                    children: data[index]
+                                        .map(
+                                          (chapter) => Container(
                                             child: InkWell(
                                               onTap: () {
+                                                widget.bloc.event.add(
+                                                    HistoryComicEvent(
+                                                        comic: widget.comic));
                                                 Navigator.pushNamed(context,
                                                     '/detail/chapter_page',
                                                     arguments: {
                                                       'id': chapter.id,
+                                                      'comic': widget.comic,
+                                                      'chapter': chapter,
                                                     });
                                               },
                                               child: Column(
@@ -331,48 +384,41 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
                                                 ],
                                               ),
                                             ),
+                                            decoration: BoxDecoration(
+                                              border: Border(
+                                                  bottom: BorderSide(
+                                                width: 1.0,
+                                                color: Colors.black12,
+                                              )),
+                                            ),
+                                            padding: EdgeInsets.all(8),
+                                            width: double.infinity,
                                           ),
-                                          InkWell(
-                                            child: Icon(LineAwesomeIcons
-                                                .cloud_download),
-                                            onTap: () {
-                                              print(chapter
-                                                  .contentTitleOfChapter);
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                            bottom: BorderSide(
-                                          width: 1.0,
-                                          color: Colors.black12,
-                                        )),
-                                      ),
-                                      padding: EdgeInsets.all(8),
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                          ],
-                        ),
-                        itemCount: data.length,
-                      );
-                    }
-                  }
+                                        )
+                                        .toList(),
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                  ),
+                                ],
+                              ),
+                              itemCount: data.length,
+                            );
+                          }
+                        }
 
-                  return Container(
-                    height: 170,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: AppColor.green,
-                      ),
+                        return Container(
+                          height: 170,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: AppColor.green,
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-          )
+                  ),
+                )
         ],
       ),
     );

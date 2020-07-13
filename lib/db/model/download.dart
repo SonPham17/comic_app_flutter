@@ -3,7 +3,7 @@ import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:floor/floor.dart';
 
 @entity
-class HistoryComic{
+class DownloadComic{
   @primaryKey
   int id;
 
@@ -23,7 +23,7 @@ class HistoryComic{
   int modPassMoney;
   int countNominated;
 
-  HistoryComic({
+  DownloadComic({
     this.id,
     this.name,
     this.introduce,
@@ -42,7 +42,7 @@ class HistoryComic{
     this.countNominated,
   });
 
-  factory HistoryComic.convertComicToHistory(Comic comic) => HistoryComic(
+  factory DownloadComic.convertComicToDownload(Comic comic) => DownloadComic(
     id: comic.id,
     name: comic.name,
     introduce: comic.introduce,

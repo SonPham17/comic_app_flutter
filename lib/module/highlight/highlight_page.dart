@@ -159,6 +159,7 @@ class HighlightListWidget extends StatelessWidget {
               margin: EdgeInsets.all(5),
               child: DetailComicPage(
                 comic: item,
+                isOpenDownload: false,
               ),
               transitionType: _transitionType,
               closedBuilder: (BuildContext _, VoidCallback openContainer) {
@@ -317,6 +318,7 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
                   children: newUpdateList
                       .map((comic) => ItemGridComic(
                             comic: comic,
+                    isOpenDownload: false,
                           ))
                       .toList(),
                 ),

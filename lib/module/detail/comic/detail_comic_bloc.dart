@@ -1,8 +1,10 @@
 import 'package:comicappflutter/base/base_bloc.dart';
 import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
+import 'package:comicappflutter/db/model/chapter.dart';
+import 'file:///F:/Flutter/comic_app_flutter/comic_app_flutter/lib/module/detail/chapter/download_comic_event.dart';
+import 'package:comicappflutter/module/detail/comic/history_comic_event.dart';
 import 'package:comicappflutter/module/detail/comic/like_comic_event.dart';
-import 'package:comicappflutter/module/detail/comic/update_comic_event.dart';
 import 'package:comicappflutter/shared/model/chapter.dart';
 import 'dart:async';
 import 'package:rxdart/rxdart.dart';
@@ -12,15 +14,16 @@ class DetailComicBloc extends BaseBloc {
 
   StreamController<List<List<Chapter>>> _chaptersSubject =
       BehaviorSubject<List<List<Chapter>>>();
-
   Stream<List<List<Chapter>>> get chaptersStream => _chaptersSubject.stream;
-
   Sink<List<List<Chapter>>> get chaptersSink => _chaptersSubject.sink;
 
+  StreamController<List<ChapterComic>> _chaptersInDBSubject =
+      BehaviorSubject<List<ChapterComic>>();
+  Stream<List<ChapterComic>> get chaptersInDBStream => _chaptersInDBSubject.stream;
+  Sink<List<ChapterComic>> get chaptersInDBSink => _chaptersInDBSubject.sink;
+
   StreamController<bool> _likeSubject = BehaviorSubject<bool>();
-
   Stream<bool> get likeStream => _likeSubject.stream;
-
   Sink<bool> get likeSink => _likeSubject.sink;
 
   bool _isLiked;
@@ -33,6 +36,12 @@ class DetailComicBloc extends BaseBloc {
       if (!_likeSubject.isClosed) {
         chaptersSink.add(value);
       }
+    });
+  }
+
+  void getChaptersListInDB(int idComic) {
+    _detailRepo.getChaptersListInDB(idComic).then((value) {
+      chaptersInDBSink.add(value);
     });
   }
 
@@ -51,10 +60,14 @@ class DetailComicBloc extends BaseBloc {
           });
         }
         break;
+      case HistoryComicEvent:
+        HistoryComicEvent historyComicEvent = baseEvent as HistoryComicEvent;
+        _detailRepo.insertHistoryComic(historyComicEvent.comic);
+        break;
     }
   }
 
-  void checkComicIsLiked(int idComic){
+  void checkComicIsLiked(int idComic) {
     _detailRepo.findComicFollowInDB(idComic).then((comic) {
       if (comic != null) {
         likeSink.add(true);
@@ -75,5 +88,6 @@ class DetailComicBloc extends BaseBloc {
     print('dispose bloc');
     _chaptersSubject.close();
     _likeSubject.close();
+    _chaptersInDBSubject.close();
   }
 }

@@ -1,4 +1,6 @@
+import 'package:comicappflutter/db/model/download.dart';
 import 'package:comicappflutter/db/model/follow.dart';
+import 'package:comicappflutter/db/model/history.dart';
 import 'package:floor/floor.dart';
 
 class Comic {
@@ -54,6 +56,16 @@ class Comic {
     return list.map((followComic) => Comic.convertFollowToComic(followComic)).toList();
   }
 
+  static List<Comic> parseComicListByHistory(listFollow){
+    var list = listFollow as List;
+    return list.map((historyComic) => Comic.convertHistoryToComic(historyComic)).toList();
+  }
+
+  static List<Comic> parseComicListByDownload(listFollow){
+    var list = listFollow as List;
+    return list.map((downloadComic) => Comic.convertDownloadToComic(downloadComic)).toList();
+  }
+
   factory Comic.fromJson(Map<String, dynamic> json) => Comic(
         id: json["id"],
         name: json["name"],
@@ -91,6 +103,44 @@ class Comic {
         modPassMoney: followComic.modPassMoney,
         countNominated: followComic.countNominated,
       );
+
+  factory Comic.convertHistoryToComic(HistoryComic historyComic) => Comic(
+    id: historyComic.id,
+    name: historyComic.name,
+    introduce: historyComic.introduce,
+    author: historyComic.author,
+    idThread: historyComic.idThread,
+    countChapter: historyComic.countChapter,
+    finish: historyComic.finish,
+    image: historyComic.image,
+    nominatedMonth: historyComic.nominatedMonth,
+    avgRate: historyComic.avgRate,
+    chinaName: historyComic.chinaName,
+    timeFix: historyComic.timeFix,
+    convertMonth: historyComic.convertMonth,
+    tags: historyComic.tags,
+    modPassMoney: historyComic.modPassMoney,
+    countNominated: historyComic.countNominated,
+  );
+
+  factory Comic.convertDownloadToComic(DownloadComic downloadComic) => Comic(
+    id: downloadComic.id,
+    name: downloadComic.name,
+    introduce: downloadComic.introduce,
+    author: downloadComic.author,
+    idThread: downloadComic.idThread,
+    countChapter: downloadComic.countChapter,
+    finish: downloadComic.finish,
+    image: downloadComic.image,
+    nominatedMonth: downloadComic.nominatedMonth,
+    avgRate: downloadComic.avgRate,
+    chinaName: downloadComic.chinaName,
+    timeFix: downloadComic.timeFix,
+    convertMonth: downloadComic.convertMonth,
+    tags: downloadComic.tags,
+    modPassMoney: downloadComic.modPassMoney,
+    countNominated: downloadComic.countNominated,
+  );
 
   Map<String, dynamic> toJson() => {
         "id": id,

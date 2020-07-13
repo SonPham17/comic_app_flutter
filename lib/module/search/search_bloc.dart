@@ -3,6 +3,7 @@ import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/repo/search_repo.dart';
 import 'package:comicappflutter/module/search/event/search_event.dart';
 import 'package:comicappflutter/module/search/event/type_search_event.dart';
+import 'package:comicappflutter/shared/model/rest_error.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:async';
 import 'package:rxdart/rxdart.dart';
@@ -38,9 +39,14 @@ class SearchBloc extends BaseBloc {
         searchSink.add(null);
         SearchEvent searchEvent = event as SearchEvent;
         if (_type_search == 'tac_gia') {
-          _searchRepo.searchByAuthorComicList(searchEvent.query).then((value) {
+          _searchRepo.searchByAuthorComicList(searchEvent.query).then(
+            (value) {
+              btnSearchSink.add(true);
+              searchSink.add(value);
+            },
+          ).catchError((e) {
             btnSearchSink.add(true);
-            searchSink.add(value);
+            searchSink.add(List<Comic>());
           });
         } else {
           _searchRepo.searchByNameComicList(searchEvent.query).then((value) {

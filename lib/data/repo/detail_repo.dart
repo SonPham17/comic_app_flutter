@@ -1,7 +1,10 @@
 import 'dart:isolate';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/db/app_database.dart';
+import 'package:comicappflutter/db/model/chapter.dart';
+import 'package:comicappflutter/db/model/download.dart';
 import 'package:comicappflutter/db/model/follow.dart';
+import 'package:comicappflutter/db/model/history.dart';
 import 'package:comicappflutter/shared/model/chapter.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/model/rest_error.dart';
@@ -22,7 +25,7 @@ class DetailRepo {
       var response = await _detailService.getChaptersList(idComic);
       var chapterNew = response.data['story']['chapter_new'];
       if (chapterNew != null) {
-        var result = await compute(taskRunner, response.data);
+        var result = await compute(taskRunner1, response.data);
         c.complete(result);
       } else {
         print('ko co vol');
@@ -59,14 +62,12 @@ class DetailRepo {
     final database =
         await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
     try {
-      var result = await database.followComicDao
+      await database.followComicDao
           .deleteComic(FollowComic.convertComicToFollow(comic));
-      if (result == 0) {
-        c.complete(false);
-      } else {
-        c.complete(true);
-      }
-    } catch (e) {}
+      c.complete(true);
+    } catch (e) {
+      c.complete(false);
+    }
     return c.future;
   }
 
@@ -75,15 +76,76 @@ class DetailRepo {
     final database =
         await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
     try {
-      var result = await database.followComicDao
+      await database.followComicDao
           .insertComic(FollowComic.convertComicToFollow(comic));
-      if (result == 0) {
-        c.complete(false);
-      } else {
-        c.complete(true);
-      }
-    } catch (e) {}
+      c.complete(true);
+    } catch (e) {
+      c.complete(false);
+    }
     return c.future;
+  }
+
+  Future<List<ChapterComic>> getChaptersListInDB(int idComic) async {
+    var c = Completer<List<ChapterComic>>();
+    final database =
+        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    try {
+      print('get chapterinDB');
+      database.chapterComicDao.findChapterByComic(idComic).then((value) {
+        if (value != null) {
+          c.complete(value);
+        } else {
+          c.complete(null);
+        }
+      });
+    } catch (e) {
+      c.complete(null);
+      print('loi get chapterinDB $e');
+    }
+    return c.future;
+  }
+
+  Future<bool> insertDownloadComic(Comic comic) async {
+    var c = Completer<bool>();
+    print('insertDownloadComic');
+    final database =
+        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    try {
+      await database.downloadComicDao
+          .insertComic(DownloadComic.convertComicToDownload(comic));
+      c.complete(true);
+    } catch (e) {
+      print('loi download $e');
+      c.complete(false);
+    }
+    return c.future;
+  }
+
+  Future<bool> insertDownloadChapter(ChapterComic chapterComic) async {
+    var c = Completer<bool>();
+    print('insertDownloadComic');
+    final database =
+        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    try {
+      await database.chapterComicDao.insertComic(chapterComic);
+      c.complete(true);
+    } catch (e) {
+      print('loi download $e');
+      c.complete(false);
+    }
+    return c.future;
+  }
+
+  Future<void> insertHistoryComic(Comic comic) async {
+    print('insert history comic');
+    final database =
+        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    try {
+      await database.historyComicDao
+          .insertComic(HistoryComic.convertComicToHistory(comic));
+    } catch (e) {
+      print('Loi roi` $e');
+    }
   }
 
   Future<Comic> findComicFollowInDB(int id) async {
@@ -104,7 +166,25 @@ class DetailRepo {
     return c.future;
   }
 
-  static List<List<Chapter>> taskRunner(dynamic data) {
+  Future<bool> findComicChapterInDB(int idChapter) async {
+    var c = Completer<bool>();
+    final database =
+        await $FloorAppDatabase.databaseBuilder('comic_database.db').build();
+    try {
+      var chapterComic =
+          await database.chapterComicDao.findComicById(idChapter);
+      if (chapterComic == null) {
+        c.complete(false);
+      } else {
+        c.complete(true);
+      }
+    } catch (e) {
+      print('Loi nay $e');
+    }
+    return c.future;
+  }
+
+  static List<List<Chapter>> taskRunner1(dynamic data) {
     var totalVol = data['story']['chapter_new']['vol'];
     var chapters = Chapter.parseChaptersList(data);
     var listChapters = List<List<Chapter>>();
