@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:comicappflutter/data/remote/category_service.dart';
 import 'package:comicappflutter/shared/model/category.dart';
-import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/model/rest_error.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';

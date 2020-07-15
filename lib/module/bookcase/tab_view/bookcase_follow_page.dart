@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:comicappflutter/module/bookcase/bookcase_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
@@ -36,7 +34,7 @@ class _BookcaseFollowPageState extends State<BookcaseFollowPage> {
               height: 170,
               child: Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: AppColor.blue,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
                 ),
               ),
             );

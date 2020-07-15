@@ -7,7 +7,6 @@ import 'package:comicappflutter/module/search/search_bloc.dart';
 import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/model/comic.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
-import 'package:comicappflutter/shared/widget/custom_appbar.dart';
 import 'package:comicappflutter/shared/widget/item_grid_comic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +118,8 @@ class _SearchListWidgetState extends State<SearchListWidget> {
                           height: 170,
                           child: Center(
                             child: CircularProgressIndicator(
-                              backgroundColor: AppColor.blue,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(AppColor.green),
                             ),
                           ),
                         );
@@ -151,7 +151,7 @@ class _SearchListWidgetState extends State<SearchListWidget> {
                             childAspectRatio: 0.5,
                             children: listDataSearch
                                 .map((comic) => ItemGridComic(
-                              isOpenDownload: false,
+                                      isOpenDownload: false,
                                       comic: comic,
                                     ))
                                 .toList(),

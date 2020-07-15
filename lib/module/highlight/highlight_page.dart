@@ -1,7 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:comicappflutter/base/base_widget.dart';
-import 'package:comicappflutter/container_transition.dart';
 import 'package:comicappflutter/data/remote/highlight_service.dart';
 import 'package:comicappflutter/data/repo/highlight_repo.dart';
 import 'package:comicappflutter/module/detail/comic/detail_comic_page.dart';
@@ -21,12 +20,6 @@ class HighlightPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageContainer(
-      leading: IconButton(
-        icon: Icon(Icons.free_breakfast),
-        onPressed: () {
-          Navigator.pushNamed(context, '/detail/chapter_page');
-        },
-      ),
       title: 'Novel Galaxy',
       actions: <Widget>[
         IconButton(
@@ -34,7 +27,7 @@ class HighlightPage extends StatelessWidget {
           onPressed: () {
             Navigator.pushNamed(context, '/search');
           },
-        )
+        ),
       ],
       isCenterTitle: true,
       di: [
@@ -53,7 +46,7 @@ class HighlightPage extends StatelessWidget {
 }
 
 class HighlightListWidget extends StatelessWidget {
-  ContainerTransitionType _transitionType = ContainerTransitionType.fade;
+  final ContainerTransitionType _transitionType = ContainerTransitionType.fade;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +106,7 @@ class HighlightListWidget extends StatelessWidget {
                 height: 170,
                 child: Center(
                   child: CircularProgressIndicator(
-                    backgroundColor: AppColor.blue,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
                   ),
                 ),
               );
@@ -260,7 +253,7 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
             height: 170,
             child: Center(
               child: CircularProgressIndicator(
-                backgroundColor: AppColor.blue,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
               ),
             ),
           );
@@ -318,7 +311,7 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
                   children: newUpdateList
                       .map((comic) => ItemGridComic(
                             comic: comic,
-                    isOpenDownload: false,
+                            isOpenDownload: false,
                           ))
                       .toList(),
                 ),

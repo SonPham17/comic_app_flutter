@@ -3,9 +3,7 @@ class RestError {
 
   RestError({this.message});
 
-  factory RestError.fromData(String msg) {
-    return RestError(
-      message: msg,
-    );
-  }
+  factory RestError.fromData(String msg) => RestError(
+        message: msg,
+      );
 }

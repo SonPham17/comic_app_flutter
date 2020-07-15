@@ -1,7 +1,6 @@
 import 'package:comicappflutter/db/model/download.dart';
 import 'package:comicappflutter/db/model/follow.dart';
 import 'package:comicappflutter/db/model/history.dart';
-import 'package:floor/floor.dart';
 
 class Comic {
   int id;

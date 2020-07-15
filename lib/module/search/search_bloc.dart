@@ -3,7 +3,6 @@ import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/repo/search_repo.dart';
 import 'package:comicappflutter/module/search/event/search_event.dart';
 import 'package:comicappflutter/module/search/event/type_search_event.dart';
-import 'package:comicappflutter/shared/model/rest_error.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:async';
 import 'package:rxdart/rxdart.dart';
@@ -52,6 +51,9 @@ class SearchBloc extends BaseBloc {
           _searchRepo.searchByNameComicList(searchEvent.query).then((value) {
             searchSink.add(value);
             btnSearchSink.add(true);
+          }).catchError((e){
+            btnSearchSink.add(true);
+            searchSink.add(List<Comic>());
           });
         }
         break;

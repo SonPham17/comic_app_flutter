@@ -1,4 +1,3 @@
-import 'dart:isolate';
 import 'package:comicappflutter/data/remote/detail_service.dart';
 import 'package:comicappflutter/db/app_database.dart';
 import 'package:comicappflutter/db/model/chapter.dart';

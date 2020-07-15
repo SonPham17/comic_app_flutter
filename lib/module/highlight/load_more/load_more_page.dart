@@ -124,7 +124,7 @@ class _LoadMoreGridWidgetState extends State<LoadMoreGridWidget> {
                     height: 170,
                     child: Center(
                       child: CircularProgressIndicator(
-                        backgroundColor: AppColor.green,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
                       ),
                     ),
                   );
@@ -206,7 +206,9 @@ class _LoadMoreGridWidgetState extends State<LoadMoreGridWidget> {
                           ? Container(
                               padding: EdgeInsets.only(bottom: 16),
                               alignment: Alignment.center,
-                              child: CircularProgressIndicator(),
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
+                              ),
                             )
                           : SizedBox(),
                     )

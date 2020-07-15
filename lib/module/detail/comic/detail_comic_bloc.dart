@@ -2,7 +2,6 @@ import 'package:comicappflutter/base/base_bloc.dart';
 import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/repo/detail_repo.dart';
 import 'package:comicappflutter/db/model/chapter.dart';
-import 'file:///F:/Flutter/comic_app_flutter/comic_app_flutter/lib/module/detail/chapter/download_comic_event.dart';
 import 'package:comicappflutter/module/detail/comic/history_comic_event.dart';
 import 'package:comicappflutter/module/detail/comic/like_comic_event.dart';
 import 'package:comicappflutter/shared/model/chapter.dart';

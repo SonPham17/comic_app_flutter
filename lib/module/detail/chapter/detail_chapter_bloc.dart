@@ -5,7 +5,6 @@ import 'package:comicappflutter/data/repo/detail_repo.dart';
 import 'package:comicappflutter/db/model/chapter.dart';
 import 'package:comicappflutter/module/detail/chapter/download_comic_event.dart';
 import 'package:comicappflutter/module/detail/chapter/download_finish_comic_event.dart';
-import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DetailChapterBloc extends BaseBloc {
@@ -32,16 +31,15 @@ class DetailChapterBloc extends BaseBloc {
         if (value.isEmpty) {
           chapterIsExistSink.add(true);
         } else {
-          chapterIsExistSink.add(false);
-        }
-      }
-    });
-    await _detailRepo.findComicChapterInDB(id).then((value) {
-      if (!_contentSubject.isClosed) {
-        if (value) {
-          chapterIsExistSink.add(true);
-        } else {
-          chapterIsExistSink.add(false);
+          _detailRepo.findComicChapterInDB(id).then((value) {
+            if (!_contentSubject.isClosed) {
+              if (value) {
+                chapterIsExistSink.add(true);
+              } else {
+                chapterIsExistSink.add(false);
+              }
+            }
+          });
         }
       }
     });

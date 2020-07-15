@@ -11,7 +11,7 @@ class ItemGridComic extends StatelessWidget {
   final bool isOpenDownload;
   final Function(bool) funcClose;
 
-  ItemGridComic({@required this.comic,this.funcClose,this.isOpenDownload});
+  ItemGridComic({@required this.comic, this.funcClose, this.isOpenDownload});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +28,12 @@ class ItemGridComic extends StatelessWidget {
             children: <Widget>[
               GestureDetector(
                 onTap: openContainer,
-                child: Image.network(
-                    'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
-                    height: 180,
-                    fit: BoxFit.cover),
+                child: FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/main_icon.png',
+                  image:
+                      'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
+                  fit: BoxFit.cover,
+                ),
               ),
               SizedBox(
                 height: 3,

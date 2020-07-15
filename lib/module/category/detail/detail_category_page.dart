@@ -110,7 +110,7 @@ class _DetailCategoryGridWidgetState extends State<DetailCategoryGridWidget> {
                   height: 170,
                   child: Center(
                     child: CircularProgressIndicator(
-                      backgroundColor: AppColor.green,
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
                     ),
                   ),
                 );
@@ -187,7 +187,9 @@ class _DetailCategoryGridWidgetState extends State<DetailCategoryGridWidget> {
                         ? Container(
                             padding: EdgeInsets.only(bottom: 16),
                             alignment: Alignment.center,
-                            child: CircularProgressIndicator(),
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
+                            ),
                           )
                         : SizedBox(),
                   )

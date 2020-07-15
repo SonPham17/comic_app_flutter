@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       builder: BotToastInit(),
       navigatorObservers: [BotToastNavigatorObserver()],
-      title: 'Comics Reader',
+      title: 'Novel Galaxy',
       theme: ThemeData(
         primarySwatch: AppColor.green,
       ),

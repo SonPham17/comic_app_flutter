@@ -1,4 +1,3 @@
-import 'package:comicappflutter/shared/app_color.dart';
 import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

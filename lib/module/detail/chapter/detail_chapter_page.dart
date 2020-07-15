@@ -436,7 +436,7 @@ class _StreamContentState extends State<StreamContent> {
               height: 170,
               child: Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: AppColor.green,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
                 ),
               ),
             );

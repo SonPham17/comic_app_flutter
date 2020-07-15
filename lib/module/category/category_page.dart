@@ -52,7 +52,7 @@ class CategoryListWidget extends StatelessWidget {
                   height: 170,
                   child: Center(
                     child: CircularProgressIndicator(
-                      backgroundColor: AppColor.blue,
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
                     ),
                   ),
                 );

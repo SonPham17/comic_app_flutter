@@ -3,8 +3,6 @@ import 'package:comicappflutter/base/base_bloc.dart';
 import 'package:comicappflutter/base/base_event.dart';
 import 'package:comicappflutter/data/repo/highlight_repo.dart';
 import 'package:comicappflutter/module/highlight/load_more/event/load_more_event.dart';
-import 'package:comicappflutter/shared/model/comic.dart';
-import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HighlightBloc extends BaseBloc {

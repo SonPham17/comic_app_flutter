@@ -36,7 +36,7 @@ class _BookcaseHistoryPageState extends State<BookcaseHistoryPage> {
               height: 170,
               child: Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: AppColor.blue,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColor.green),
                 ),
               ),
             );

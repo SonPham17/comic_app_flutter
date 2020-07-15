@@ -1,6 +1,5 @@
 import 'package:comicappflutter/db/model/follow.dart';
 import 'package:floor/floor.dart';
-import 'package:comicappflutter/shared/model/comic.dart';
 
 @dao
 abstract class FollowComicDAO{
