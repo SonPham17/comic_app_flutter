@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   CircularBottomNavigationController _navigationController;
   double bottomNavBarHeight = 60;
   int _currentIndex = 0;
@@ -62,5 +62,12 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _navigationController.dispose();
   }
 }

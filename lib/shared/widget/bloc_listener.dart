@@ -25,6 +25,7 @@ class _BlocListenerState<T> extends State<BlocListener> {
     bloc.processEventStream.listen(
       (event) {
         widget.listener(event);
+        
       },
     );
   }

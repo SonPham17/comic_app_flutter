@@ -32,6 +32,8 @@ class _DetailChapterPageState extends State<DetailChapterPage>
   Chapter chapter;
   double statusBarHeight;
 
+  ScrollController _scrollController;
+
   double _value = 14;
   String fontStyle = 'Sriracha';
   Color backgroundStyleColor = Colors.white;
@@ -44,6 +46,10 @@ class _DetailChapterPageState extends State<DetailChapterPage>
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
+    );
+    _scrollController = ScrollController(
+      initialScrollOffset: 0.0,
+      keepScrollOffset: true,
     );
   }
 
@@ -73,6 +79,18 @@ class _DetailChapterPageState extends State<DetailChapterPage>
         ),
       ],
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColor.green,
+          mini: true,
+          onPressed: () {
+            _scrollController.animateTo(
+              0,
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          },
+          child: Icon(Icons.arrow_upward),
+        ),
         body: Provider(
           create: (context) => DetailChapterBloc(
             detailRepo: Provider.of(
@@ -98,6 +116,8 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                       padding: EdgeInsets.only(
                           top: statusBarHeight, left: 5, right: 5),
                       child: ContentChapterWidget(
+                        chapter: chapter,
+                        scrollController: _scrollController,
                         id: idChapter,
                         sizeText: _value,
                         fontStyle: fontStyle,
@@ -362,6 +382,7 @@ class _DetailChapterPageState extends State<DetailChapterPage>
   void dispose() {
     super.dispose();
     _controller.dispose();
+    _scrollController.dispose();
   }
 }
 
@@ -372,9 +393,13 @@ class ContentChapterWidget extends StatelessWidget {
   final Color textColor;
   final Color backgroundStyleColor;
   final DetailChapterBloc detailChapterBloc;
+  final ScrollController scrollController;
+  final Chapter chapter;
 
   ContentChapterWidget({
+    this.scrollController,
     this.id,
+    this.chapter,
     this.sizeText,
     this.fontStyle,
     this.textColor,
@@ -385,11 +410,13 @@ class ContentChapterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamContent(
+      scrollController: scrollController,
       detailChapterBloc: detailChapterBloc,
       id: id,
       sizeText: sizeText,
       fontStyle: fontStyle,
       textColor: textColor,
+      chapter: chapter,
       backgroundStyleColor: backgroundStyleColor,
     );
   }
@@ -402,14 +429,18 @@ class StreamContent extends StatefulWidget {
   final String fontStyle;
   final Color textColor;
   final Color backgroundStyleColor;
+  final ScrollController scrollController;
+  final Chapter chapter;
 
   StreamContent({
     this.detailChapterBloc,
     this.id,
     this.sizeText,
+    this.chapter,
     this.fontStyle,
     this.textColor,
     this.backgroundStyleColor,
+    this.scrollController,
   });
 
   @override
@@ -454,15 +485,31 @@ class _StreamContentState extends State<StreamContent> {
           }
 
           return SingleChildScrollView(
+            controller: widget.scrollController,
             child: Container(
               color: widget.backgroundStyleColor,
-              child: Text(
-                content,
-                style: GoogleFonts.getFont(
-                  widget.fontStyle,
-                  fontSize: widget.sizeText,
-                  color: widget.textColor,
-                ),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    '${widget.chapter.nameIdChapter}: ${widget.chapter.contentTitleOfChapter}',
+                    style: GoogleFonts.getFont(
+                      widget.fontStyle,
+                      fontSize: widget.sizeText+7,
+                      color: widget.textColor,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    content,
+                    style: GoogleFonts.getFont(
+                      widget.fontStyle,
+                      fontSize: widget.sizeText,
+                      color: widget.textColor,
+                    ),
+                  ),
+                ],
               ),
             ),
           );

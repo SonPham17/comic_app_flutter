@@ -11,12 +11,16 @@ class DetailChapterDBPage extends StatefulWidget {
   _DetailChapterDBPageState createState() => _DetailChapterDBPageState();
 }
 
-class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTickerProviderStateMixin{
+class _DetailChapterDBPageState extends State<DetailChapterDBPage>
+    with SingleTickerProviderStateMixin {
   AnimationController _controller;
+  ScrollController _scrollController;
 
   double statusBarHeight;
 
   String content;
+  String nameIdChapter;
+  String contentTitleOfChapter;
 
   double _value = 14;
   String fontStyle = 'Sriracha';
@@ -31,6 +35,10 @@ class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTi
       vsync: this,
       duration: Duration(milliseconds: 300),
     );
+    _scrollController = ScrollController(
+      initialScrollOffset: 0.0,
+      keepScrollOffset: true,
+    );
   }
 
   @override
@@ -41,12 +49,26 @@ class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTi
     statusBarHeight = MediaQuery.of(context).padding.top;
     if (arguments != null) {
       content = arguments['content'];
+      nameIdChapter = arguments['name_id_chapter'];
+      contentTitleOfChapter = arguments['content_title_of_chapter'];
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColor.green,
+        mini: true,
+        onPressed: () {
+          _scrollController.animateTo(
+            0,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        },
+        child: Icon(Icons.arrow_upward),
+      ),
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) => Stack(
@@ -61,18 +83,31 @@ class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTi
               },
               child: Container(
                 color: backgroundStyleColor,
-                padding: EdgeInsets.only(
-                    top: statusBarHeight, left: 5, right: 5),
+                padding:
+                    EdgeInsets.only(top: statusBarHeight, left: 5, right: 5),
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   child: Container(
                     color: backgroundStyleColor,
-                    child: Text(
-                      content,
-                      style: GoogleFonts.getFont(
-                        fontStyle,
-                        fontSize: _value,
-                        color: textStyleColor,
-                      ),
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          '$nameIdChapter: $contentTitleOfChapter',
+                          style: GoogleFonts.getFont(
+                            fontStyle,
+                            fontSize: _value + 7,
+                            color: textStyleColor,
+                          ),
+                        ),
+                        Text(
+                          content,
+                          style: GoogleFonts.getFont(
+                            fontStyle,
+                            fontSize: _value,
+                            color: textStyleColor,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -145,26 +180,26 @@ class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTi
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: listBackgroundStyle
                     .map((item) => InkWell(
-                  onTap: () {
-                    setModalState(
-                          () {
-                        var index = listBackgroundStyle.indexWhere(
-                                (element) => element.isSelected == true);
-                        listBackgroundStyle[index].isSelected = false;
-                        item.isSelected = true;
-                      },
-                    );
-                    setState(() {
-                      backgroundStyleColor = item.backgroundColor;
-                      textStyleColor = item.textColor;
-                    });
-                  },
-                  child: Icon(
-                    item.iconData,
-                    color:
-                    item.isSelected ? AppColor.green : Colors.black,
-                  ),
-                ))
+                          onTap: () {
+                            setModalState(
+                              () {
+                                var index = listBackgroundStyle.indexWhere(
+                                    (element) => element.isSelected == true);
+                                listBackgroundStyle[index].isSelected = false;
+                                item.isSelected = true;
+                              },
+                            );
+                            setState(() {
+                              backgroundStyleColor = item.backgroundColor;
+                              textStyleColor = item.textColor;
+                            });
+                          },
+                          child: Icon(
+                            item.iconData,
+                            color:
+                                item.isSelected ? AppColor.green : Colors.black,
+                          ),
+                        ))
                     .toList(),
               ),
             ),
@@ -177,36 +212,36 @@ class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTi
                 scrollDirection: Axis.horizontal,
                 children: listFontStyle
                     .map((item) => InkWell(
-                  onTap: () {
-                    setModalState(
-                          () {
-                        var index = listFontStyle.indexWhere(
-                                (element) => element.isSelected == true);
-                        listFontStyle[index].isSelected = false;
-                        item.isSelected = true;
-                      },
-                    );
-                    setState(() {
-                      fontStyle = item.name;
-                    });
-                  },
-                  child: Center(
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      child: Text(
-                        item.name,
-                        style: GoogleFonts.getFont(
-                          item.name,
-                          fontSize: 15,
-                          color: item.isSelected
-                              ? AppColor.green
-                              : Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ))
+                          onTap: () {
+                            setModalState(
+                              () {
+                                var index = listFontStyle.indexWhere(
+                                    (element) => element.isSelected == true);
+                                listFontStyle[index].isSelected = false;
+                                item.isSelected = true;
+                              },
+                            );
+                            setState(() {
+                              fontStyle = item.name;
+                            });
+                          },
+                          child: Center(
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                item.name,
+                                style: GoogleFonts.getFont(
+                                  item.name,
+                                  fontSize: 15,
+                                  color: item.isSelected
+                                      ? AppColor.green
+                                      : Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ))
                     .toList(),
               ),
             ),
@@ -226,11 +261,11 @@ class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTi
                         trackShape: RoundedRectSliderTrackShape(),
                         trackHeight: 4.0,
                         thumbShape:
-                        RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                            RoundSliderThumbShape(enabledThumbRadius: 12.0),
                         thumbColor: Colors.greenAccent,
                         overlayColor: Colors.green.withAlpha(32),
                         overlayShape:
-                        RoundSliderOverlayShape(overlayRadius: 28.0),
+                            RoundSliderOverlayShape(overlayRadius: 28.0),
                         tickMarkShape: RoundSliderTickMarkShape(),
                         activeTickMarkColor: Colors.green[700],
                         inactiveTickMarkColor: Colors.green[100],
@@ -251,7 +286,7 @@ class _DetailChapterDBPageState extends State<DetailChapterDBPage> with SingleTi
                             print('setState');
                           });
                           setModalState(
-                                () {
+                            () {
                               _value = value;
                             },
                           );
