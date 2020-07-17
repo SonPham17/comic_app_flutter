@@ -306,7 +306,7 @@ class _ItemComicListPageState extends State<ItemComicListPage> {
                   crossAxisSpacing: 5,
                   // khoảng cách giữa các cột theo trục ngang
                   padding: EdgeInsets.all(5),
-                  childAspectRatio: 0.5,
+                  childAspectRatio: 0.55,
                   physics: NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   children: newUpdateList

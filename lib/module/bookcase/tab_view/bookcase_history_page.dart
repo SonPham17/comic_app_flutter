@@ -64,9 +64,7 @@ class _BookcaseHistoryPageState extends State<BookcaseHistoryPage> {
                 crossAxisSpacing: 5,
                 // khoảng cách giữa các cột theo trục ngang
                 padding: EdgeInsets.all(5),
-                childAspectRatio: 0.5,
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
+                childAspectRatio: 0.55,
                 children: data
                     .map((comic) => ItemGridComic(
                   isOpenDownload: false,

@@ -385,151 +385,154 @@ class _DetailFooterComicWidgetState extends State<DetailFooterComicWidget> {
                     },
                   ),
                 )
-              : Container(
-                  child: StreamProvider<List<List<Chapter>>>.value(
-                    value: widget.bloc.chaptersStream,
-                    child: Consumer<List<List<Chapter>>>(
-                      builder: (context, data, child) {
-                        if (data != null) {
-                          if (data.length == 0) {
-                            return Container(
-                              height: 170,
-                              child: Center(
-                                child: Text('Chưa có dữ liệu về truyện này',
-                                    style: TvStyle.fontAppWithCustom()),
-                              ),
-                            );
-                          }
-
-                          if (data.length == 1) {
-                            return ListView.builder(
-                              itemBuilder: (context, index) => Container(
-                                child: InkWell(
-                                  onTap: () {
-                                    widget.bloc.event.add(
-                                        HistoryComicEvent(comic: widget.comic));
-                                    Navigator.pushNamed(
-                                        context, '/detail/chapter_page',
-                                        arguments: {
-                                          'id': data[0][index].id,
-                                          'comic': widget.comic,
-                                          'chapter': data[0][index],
-                                        });
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        '${data[0][index].nameIdChapter}: ${data[0][index].contentTitleOfChapter}',
-                                        style:
-                                            TvStyle.fontAppWithCustom(size: 16),
-                                      ),
-                                      Text(
-                                        '${data[0][index].updatedAt}',
-                                        style:
-                                            TvStyle.fontAppWithCustom(size: 11),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                    width: 1.0,
-                                    color: Colors.black12,
-                                  )),
-                                ),
-                                padding: EdgeInsets.all(8),
-                                width: double.infinity,
-                              ),
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: data[0].length,
-                            );
-                          } else {
-                            return ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) => ExpansionTile(
-                                title: Text(
-                                  'Phần ${index + 1}',
-                                  style: TvStyle.fontAppWithCustom(size: 18),
-                                ),
-                                children: <Widget>[
-                                  Column(
-                                    children: data[index]
-                                        .map(
-                                          (chapter) => Container(
-                                            child: InkWell(
-                                              onTap: () {
-                                                widget.bloc.event.add(
-                                                    HistoryComicEvent(
-                                                        comic: widget.comic));
-                                                Navigator.pushNamed(context,
-                                                    '/detail/chapter_page',
-                                                    arguments: {
-                                                      'id': chapter.id,
-                                                      'comic': widget.comic,
-                                                      'chapter': chapter,
-                                                    });
-                                              },
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Text(
-                                                    '${chapter.nameIdChapter}: ${chapter.contentTitleOfChapter}',
-                                                    style: TvStyle
-                                                        .fontAppWithCustom(
-                                                            size: 16),
-                                                  ),
-                                                  Text(
-                                                    '${chapter.updatedAt}',
-                                                    style: TvStyle
-                                                        .fontAppWithCustom(
-                                                            size: 11),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            decoration: BoxDecoration(
-                                              border: Border(
-                                                  bottom: BorderSide(
-                                                width: 1.0,
-                                                color: Colors.black12,
-                                              )),
-                                            ),
-                                            padding: EdgeInsets.all(8),
-                                            width: double.infinity,
-                                          ),
-                                        )
-                                        .toList(),
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                  ),
-                                ],
-                              ),
-                              itemCount: data.length,
-                            );
-                          }
+              : StreamProvider<List<List<Chapter>>>.value(
+                  value: widget.bloc.chaptersStream,
+                  child: Consumer<List<List<Chapter>>>(
+                    builder: (context, data, child) {
+                      if (data != null) {
+                        if (data.length == 0) {
+                          return Container(
+                            height: 170,
+                            child: Center(
+                              child: Text('Chưa có dữ liệu về truyện này',
+                                  style: TvStyle.fontAppWithCustom()),
+                            ),
+                          );
                         }
 
-                        return Container(
-                          height: 170,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(AppColor.green),
+                        if (data.length == 1) {
+                          return ListView.builder(
+                            itemBuilder: (context, index) => Container(
+                              child: InkWell(
+                                onTap: () {
+                                  widget.bloc.event.add(
+                                      HistoryComicEvent(comic: widget.comic));
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/detail/chapter_page',
+                                    arguments: {
+                                      'id': data[0][index].id,
+                                      'comic': widget.comic,
+                                      'chapter': data[0][index],
+                                      'data': data[0],
+                                      'index': index,
+                                    },
+                                  );
+                                },
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      '${data[0][index].nameIdChapter}: ${data[0][index].contentTitleOfChapter}',
+                                      style:
+                                          TvStyle.fontAppWithCustom(size: 16),
+                                    ),
+                                    Text(
+                                      '${data[0][index].updatedAt}',
+                                      style:
+                                          TvStyle.fontAppWithCustom(size: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(
+                                  width: 1.0,
+                                  color: Colors.black12,
+                                )),
+                              ),
+                              padding: EdgeInsets.all(8),
+                              width: double.infinity,
                             ),
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: data[0].length,
+                          );
+                        } else {
+                          return ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) => ExpansionTile(
+                              title: Text(
+                                'Phần ${index + 1}',
+                                style: TvStyle.fontAppWithCustom(size: 18),
+                              ),
+                              children: <Widget>[
+                                Column(
+                                  children: data[index]
+                                      .map(
+                                        (chapter) => Container(
+                                          child: InkWell(
+                                            onTap: () {
+                                              widget.bloc.event.add(
+                                                  HistoryComicEvent(
+                                                      comic: widget.comic));
+                                              Navigator.pushNamed(context,
+                                                  '/detail/chapter_page',
+                                                  arguments: {
+                                                    'id': chapter.id,
+                                                    'comic': widget.comic,
+                                                    'chapter': chapter,
+                                                    'index': data[index]
+                                                        .indexOf(chapter),
+                                                    'data': data[index],
+                                                  });
+                                            },
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  '${chapter.nameIdChapter}: ${chapter.contentTitleOfChapter}',
+                                                  style:
+                                                      TvStyle.fontAppWithCustom(
+                                                          size: 16),
+                                                ),
+                                                Text(
+                                                  '${chapter.updatedAt}',
+                                                  style:
+                                                      TvStyle.fontAppWithCustom(
+                                                          size: 11),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                                bottom: BorderSide(
+                                              width: 1.0,
+                                              color: Colors.black12,
+                                            )),
+                                          ),
+                                          padding: EdgeInsets.all(8),
+                                          width: double.infinity,
+                                        ),
+                                      )
+                                      .toList(),
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                ),
+                              ],
+                            ),
+                            itemCount: data.length,
+                          );
+                        }
+                      }
+
+                      return Container(
+                        height: 170,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(AppColor.green),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 )
         ],

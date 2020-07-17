@@ -33,6 +33,7 @@ class DetailComicBloc extends BaseBloc {
   void getChaptersList(int idComic) {
     _detailRepo.getChaptersList(idComic).then((value) {
       if (!_likeSubject.isClosed) {
+        print('get data done');
         chaptersSink.add(value);
       }
     });

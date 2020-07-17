@@ -27,10 +27,12 @@ class DetailChapterPage extends StatefulWidget {
 class _DetailChapterPageState extends State<DetailChapterPage>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
-  int idChapter;
-  Comic comic;
-  Chapter chapter;
+  int _idChapter;
+  Comic _comic;
+  Chapter _chapter;
   double statusBarHeight;
+  List<Chapter> _chapterLists;
+  int _index;
 
   ScrollController _scrollController;
 
@@ -56,12 +58,14 @@ class _DetailChapterPageState extends State<DetailChapterPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    widthScreen = (MediaQuery.of(context).size.width) / 9;
+    widthScreen = (MediaQuery.of(context).size.width) / 12;
     var arguments = ModalRoute.of(context).settings.arguments as Map;
     if (arguments != null) {
-      idChapter = arguments['id'];
-      comic = arguments['comic'];
-      chapter = arguments['chapter'];
+      _idChapter = arguments['id'];
+      _comic = arguments['comic'];
+      _chapter = arguments['chapter'];
+      _chapterLists = arguments['data'];
+      _index = arguments['index'];
     }
     statusBarHeight = MediaQuery.of(context).padding.top;
   }
@@ -79,6 +83,56 @@ class _DetailChapterPageState extends State<DetailChapterPage>
         ),
       ],
       child: Scaffold(
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              DrawerHeader(
+                child: Center(
+                  child: Text(
+                    'Danh sách chương',
+                    style: TvStyle.fontAppWithCustom(size: 30),
+                  ),
+                ),
+              ),
+              ListView(
+                children: ListTile.divideTiles(
+                        tiles: _chapterLists.map(
+                          (chap) => ListTile(
+                            title: Text(
+                              '${chap.nameIdChapter}: ${chap.contentTitleOfChapter}',
+                              style: TvStyle.fontAppWithCustom(size: 16),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              '${chap.updatedAt}',
+                              style: TvStyle.fontAppWithCustom(size: 11),
+                            ),
+                            selected: _chapterLists.indexOf(chap) == _index
+                                ? true
+                                : false,
+                            onTap: () {
+                              setState(() {
+                                _index = _chapterLists.indexOf(chap);
+                                _idChapter = chap.id;
+                                _chapter = chap;
+                                Navigator.of(context).pop();
+                              });
+                            },
+                          ),
+                        ),
+                        context: context)
+                    .toList(),
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+              ),
+            ],
+            controller: ScrollController(
+              initialScrollOffset: _index * 65.5,
+              keepScrollOffset: true,
+            ),
+          ),
+        ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: AppColor.green,
           mini: true,
@@ -116,9 +170,9 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                       padding: EdgeInsets.only(
                           top: statusBarHeight, left: 5, right: 5),
                       child: ContentChapterWidget(
-                        chapter: chapter,
+                        chapter: _chapter,
                         scrollController: _scrollController,
-                        id: idChapter,
+                        id: _idChapter,
                         sizeText: _value,
                         fontStyle: fontStyle,
                         textColor: textStyleColor,
@@ -145,6 +199,30 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                         child: Icon(
                           Icons.close,
                           color: AppColor.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Transform.translate(
+                    offset: Offset(0, -_controller.value * 100),
+                    child: Container(
+                      margin: EdgeInsets.only(
+                          top: statusBarHeight + 10, left: widthScreen * 4),
+                      height: widthScreen,
+                      width: widthScreen,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColor.green,
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        child: Icon(
+                          Icons.menu,
+                          size: 18,
+                          color: AppColor.white,
                         ),
                       ),
                     ),
@@ -155,7 +233,7 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                       offset: Offset(0, -_controller.value * 100),
                       child: Container(
                         margin: EdgeInsets.only(
-                            top: statusBarHeight + 10, left: widthScreen * 4),
+                            top: statusBarHeight + 10, left: widthScreen * 7),
                         height: widthScreen,
                         width: widthScreen,
                         decoration: BoxDecoration(
@@ -169,10 +247,11 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                             builder: (_, isExist, child) {
                               if (isExist) {
                                 return FloatingActionButton(
-                                  backgroundColor: Colors.black38,
+                                  backgroundColor: Colors.grey,
                                   onPressed: null,
                                   child: Icon(
                                     LineAwesomeIcons.cloud_download,
+                                    size: 18,
                                     color: AppColor.white,
                                   ),
                                 );
@@ -181,12 +260,13 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                                   backgroundColor: AppColor.green,
                                   onPressed: () {
                                     bloc.event.add(DownloadComicEvent(
-                                      comic: comic,
-                                      chapter: chapter,
+                                      comic: _comic,
+                                      chapter: _chapter,
                                     ));
                                   },
                                   child: Icon(
                                     LineAwesomeIcons.cloud_download,
+                                    size: 18,
                                     color: AppColor.white,
                                   ),
                                 );
@@ -201,7 +281,7 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                     offset: Offset(0, -_controller.value * 100),
                     child: Container(
                       margin: EdgeInsets.only(
-                          top: statusBarHeight + 10, left: widthScreen * 7),
+                          top: statusBarHeight + 10, left: widthScreen * 10),
                       height: widthScreen,
                       width: widthScreen,
                       decoration: BoxDecoration(
@@ -219,6 +299,7 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                         },
                         child: Icon(
                           LineAwesomeIcons.font,
+                          size: 18,
                           color: AppColor.white,
                         ),
                       ),
@@ -494,7 +575,7 @@ class _StreamContentState extends State<StreamContent> {
                     '${widget.chapter.nameIdChapter}: ${widget.chapter.contentTitleOfChapter}',
                     style: GoogleFonts.getFont(
                       widget.fontStyle,
-                      fontSize: widget.sizeText+7,
+                      fontSize: widget.sizeText + 7,
                       color: widget.textColor,
                     ),
                   ),
