@@ -6,8 +6,11 @@ import 'package:comicappflutter/shared/style/tv_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_share/flutter_share.dart';
+import 'package:image_ink_well/image_ink_well.dart';
 import 'package:line_awesome_icons/line_awesome_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:rate_my_app/rate_my_app.dart';
 
 class ExtensionPage extends StatelessWidget {
   @override
@@ -30,7 +33,69 @@ class ExtensionPage extends StatelessWidget {
   }
 }
 
-class ExtensionListWidget extends StatelessWidget {
+class ExtensionListWidget extends StatefulWidget {
+  @override
+  _ExtensionListWidgetState createState() => _ExtensionListWidgetState();
+}
+
+class _ExtensionListWidgetState extends State<ExtensionListWidget> {
+  RateMyApp _rateMyApp = RateMyApp(
+    preferencesPrefix: 'rateMyApp',
+    minDays: 3,
+    minLaunches: 7,
+    remindDays: 2,
+    remindLaunches: 5,
+//    appStoreIdentifier: '',
+//    googlePlayIdentifier: '',
+  );
+
+  void clickRate() {
+    _rateMyApp.init().then((value) {
+      _rateMyApp.showStarRateDialog(
+        context,
+        title: 'Rate Novel Galaxy App',
+        message: 'Please leave a rating!',
+        actionsBuilder: (context, starts) {
+          return [
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                if (starts != null) {
+                  _rateMyApp
+                      .callEvent(RateMyAppEventType.rateButtonPressed)
+                      .then((_) => Navigator.pop<RateMyAppDialogButton>(
+                          context, RateMyAppDialogButton.rate));
+                }
+              },
+            )
+          ];
+        },
+        dialogStyle: DialogStyle(
+          titleAlign: TextAlign.center,
+          messageAlign: TextAlign.center,
+          messagePadding: EdgeInsets.only(bottom: 20.0),
+        ),
+        starRatingOptions: StarRatingOptions(),
+      );
+    });
+  }
+
+  Future<void> share() async {
+    await FlutterShare.share(
+        title: 'Example share',
+        text: 'Example share text',
+        linkUrl: 'https://flutter.dev/',
+        chooserTitle: 'Example Chooser Title');
+  }
+
+  Future<void> feedback() async {
+    await FlutterShare.share(
+        title: 'Phản hồi',
+        text: 'Liên hệ phản hồi: ',
+        linkUrl: 'novelgalaxy@gmail.com',
+        chooserTitle: 'Feedback Chooser Title');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,22 +114,19 @@ class ExtensionListWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                  margin: EdgeInsets.only(top: 30),
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white60, width: 2.0),
-                  ),
-                  padding: EdgeInsets.all(6.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(50),
-                    child: Image.asset(
+                margin: EdgeInsets.only(top: 30),
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage(
                       'assets/images/main_icon.png',
-                      height: 120,
-                      width: 120,
                     ),
-                  )),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
             ],
           ),
           Text(
@@ -82,20 +144,19 @@ class ExtensionListWidget extends StatelessWidget {
               physics: ClampingScrollPhysics(),
               children: <Widget>[
                 ExtensionListItem(
-                  iconData: LineAwesomeIcons.globe,
-                  text: 'Chọn nguồn truyện',
-                ),
-                ExtensionListItem(
                   iconData: LineAwesomeIcons.star,
                   text: 'Đánh giá ứng dụng',
+                  onPressed: clickRate,
                 ),
                 ExtensionListItem(
                   iconData: LineAwesomeIcons.share_alt,
                   text: 'Chia sẻ với bạn bè',
+                  onPressed: share,
                 ),
                 ExtensionListItem(
                   iconData: LineAwesomeIcons.comment,
                   text: 'Phản hồi góp ý',
+                  onPressed: feedback,
                 ),
                 ExtensionListItem(
                   iconData: LineAwesomeIcons.user,
@@ -114,8 +175,10 @@ class ExtensionListItem extends StatelessWidget {
   final IconData iconData;
   final String text;
   final bool hasNavigation;
+  final Function onPressed;
 
-  ExtensionListItem({this.iconData, this.text, this.hasNavigation = false});
+  ExtensionListItem(
+      {this.iconData, this.text, this.hasNavigation = false, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +195,7 @@ class ExtensionListItem extends StatelessWidget {
         horizontal: 15,
       ),
       child: FlatButton(
-        onPressed: () {},
+        onPressed: onPressed,
         child: Row(
           children: <Widget>[
             Icon(

@@ -82,78 +82,80 @@ class _DetailChapterPageState extends State<DetailChapterPage>
               DetailRepo(detailService: detailService),
         ),
       ],
-      child: Scaffold(
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              DrawerHeader(
-                child: Center(
-                  child: Text(
-                    'Danh sách chương',
-                    style: TvStyle.fontAppWithCustom(size: 30),
+      child: Provider(
+        create: (context) => DetailChapterBloc(
+          detailRepo: Provider.of(
+            context,
+            listen: false,
+          ),
+        ),
+        child: Consumer<DetailChapterBloc>(
+          builder: (_, bloc, child) => Scaffold(
+            drawer: Drawer(
+              child: ListView(
+                children: <Widget>[
+                  DrawerHeader(
+                    child: Center(
+                      child: Text(
+                        'Danh sách chương',
+                        style: TvStyle.fontAppWithCustom(size: 30),
+                      ),
+                    ),
                   ),
+                  ListView(
+                    children: ListTile.divideTiles(
+                            tiles: _chapterLists.map(
+                              (chap) => ListTile(
+                                title: Text(
+                                  '${chap.nameIdChapter}: ${chap.contentTitleOfChapter}',
+                                  style: TvStyle.fontAppWithCustom(size: 16),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(
+                                  '${chap.updatedAt}',
+                                  style: TvStyle.fontAppWithCustom(size: 11),
+                                ),
+                                selected: _chapterLists.indexOf(chap) == _index
+                                    ? true
+                                    : false,
+                                onTap: () {
+                                  setState(() {
+                                    _index = _chapterLists.indexOf(chap);
+                                    _idChapter = chap.id;
+                                    _chapter = chap;
+                                    bloc.contentSink.add(null);
+                                    bloc.getContentChapter(_idChapter);
+                                    Navigator.of(context).pop();
+                                  });
+                                },
+                              ),
+                            ),
+                            context: context)
+                        .toList(),
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                  ),
+                ],
+                controller: ScrollController(
+                  initialScrollOffset: _index * 65.5,
+                  keepScrollOffset: true,
                 ),
               ),
-              ListView(
-                children: ListTile.divideTiles(
-                        tiles: _chapterLists.map(
-                          (chap) => ListTile(
-                            title: Text(
-                              '${chap.nameIdChapter}: ${chap.contentTitleOfChapter}',
-                              style: TvStyle.fontAppWithCustom(size: 16),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Text(
-                              '${chap.updatedAt}',
-                              style: TvStyle.fontAppWithCustom(size: 11),
-                            ),
-                            selected: _chapterLists.indexOf(chap) == _index
-                                ? true
-                                : false,
-                            onTap: () {
-                              setState(() {
-                                _index = _chapterLists.indexOf(chap);
-                                _idChapter = chap.id;
-                                _chapter = chap;
-                                Navigator.of(context).pop();
-                              });
-                            },
-                          ),
-                        ),
-                        context: context)
-                    .toList(),
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-              ),
-            ],
-            controller: ScrollController(
-              initialScrollOffset: _index * 65.5,
-              keepScrollOffset: true,
             ),
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColor.green,
-          mini: true,
-          onPressed: () {
-            _scrollController.animateTo(
-              0,
-              duration: Duration(milliseconds: 500),
-              curve: Curves.easeInOut,
-            );
-          },
-          child: Icon(Icons.arrow_upward),
-        ),
-        body: Provider(
-          create: (context) => DetailChapterBloc(
-            detailRepo: Provider.of(
-              context,
-              listen: false,
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: AppColor.green,
+              mini: true,
+              onPressed: () {
+                _scrollController.animateTo(
+                  0,
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                );
+              },
+              child: Icon(Icons.arrow_upward),
             ),
-          ),
-          child: Consumer<DetailChapterBloc>(
-            builder: (_, bloc, child) => AnimatedBuilder(
+            body: AnimatedBuilder(
               animation: _controller,
               builder: (context, child) => Stack(
                 children: <Widget>[
@@ -532,6 +534,7 @@ class _StreamContentState extends State<StreamContent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    print('getContentChapter');
     widget.detailChapterBloc.getContentChapter(widget.id);
   }
 
