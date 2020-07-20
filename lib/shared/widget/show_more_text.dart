@@ -10,16 +10,16 @@ class ShowMoreText extends StatefulWidget {
   final bool shouldShowLessText;
   final String showLessText;
 
-  const ShowMoreText(
-      this.text, {
-        Key key,
-        this.maxLength: 100,
-        this.showMoreText,
-        this.style,
-        this.showMoreStyle,
-        this.shouldShowLessText: false,
-        this.showLessText,
-      })  : assert(text != null),
+  const ShowMoreText(this.text, {
+    Key key,
+    this.maxLength: 100,
+    this.showMoreText,
+    this.style,
+    this.showMoreStyle,
+    this.shouldShowLessText: false,
+    this.showLessText,
+  })
+      : assert(text != null),
         assert(maxLength != null),
         assert(shouldShowLessText != null),
         super(key: key);
@@ -46,8 +46,14 @@ class _ShowMoreTextState extends State<ShowMoreText> {
     }
 
     var showMoreStyle = widget.showMoreStyle ??
-        Theme.of(context).textTheme.body2.copyWith(
-          color: Theme.of(context).accentColor,
+        Theme
+            .of(context)
+            .textTheme
+            .body2
+            .copyWith(
+          color: Theme
+              .of(context)
+              .accentColor,
         );
 
     if (full) {

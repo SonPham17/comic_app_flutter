@@ -177,6 +177,7 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                         id: _idChapter,
                         sizeText: _value,
                         fontStyle: fontStyle,
+                        animationController: _controller,
                         textColor: textStyleColor,
                         backgroundStyleColor: backgroundStyleColor,
                         detailChapterBloc: bloc,
@@ -303,6 +304,88 @@ class _DetailChapterPageState extends State<DetailChapterPage>
                           LineAwesomeIcons.font,
                           size: 18,
                           color: AppColor.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 30,
+                    child: Transform.translate(
+                      offset: Offset(0, _controller.value * 100),
+                      child: Container(
+                        margin: EdgeInsets.only(
+                          left: 20,
+                        ),
+                        height: widthScreen,
+                        width: widthScreen,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColor.green,
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (_index == 0) {
+                                _index = _chapterLists.length - 1;
+                                _idChapter = _chapterLists[_index].id;
+                                _chapter = _chapterLists[_index];
+                                bloc.contentSink.add(null);
+                                bloc.getContentChapter(_idChapter);
+                              } else {
+                                _index = _index - 1;
+                                _idChapter = _chapterLists[_index].id;
+                                _chapter = _chapterLists[_index];
+                                bloc.contentSink.add(null);
+                                bloc.getContentChapter(_idChapter);
+                              }
+                            });
+                          },
+                          child: Icon(
+                            LineAwesomeIcons.angle_left,
+                            size: 18,
+                            color: AppColor.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 30,
+                    child: Transform.translate(
+                      offset: Offset(0, _controller.value * 100),
+                      child: Container(
+                        margin: EdgeInsets.only(
+                          left: 90,
+                        ),
+                        height: widthScreen,
+                        width: widthScreen,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColor.green,
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (_index == _chapterLists.length - 1) {
+                                _index = 0;
+                                _idChapter = _chapterLists[_index].id;
+                                _chapter = _chapterLists[_index];
+                                bloc.contentSink.add(null);
+                                bloc.getContentChapter(_idChapter);
+                              } else {
+                                _index = _index + 1;
+                                _idChapter = _chapterLists[_index].id;
+                                _chapter = _chapterLists[_index];
+                                bloc.contentSink.add(null);
+                                bloc.getContentChapter(_idChapter);
+                              }
+                            });
+                          },
+                          child: Icon(
+                            LineAwesomeIcons.angle_right,
+                            size: 18,
+                            color: AppColor.white,
+                          ),
                         ),
                       ),
                     ),
@@ -478,11 +561,13 @@ class ContentChapterWidget extends StatelessWidget {
   final DetailChapterBloc detailChapterBloc;
   final ScrollController scrollController;
   final Chapter chapter;
+  final AnimationController animationController;
 
   ContentChapterWidget({
     this.scrollController,
     this.id,
     this.chapter,
+    this.animationController,
     this.sizeText,
     this.fontStyle,
     this.textColor,
@@ -497,6 +582,7 @@ class ContentChapterWidget extends StatelessWidget {
       detailChapterBloc: detailChapterBloc,
       id: id,
       sizeText: sizeText,
+      animationController: animationController,
       fontStyle: fontStyle,
       textColor: textColor,
       chapter: chapter,
@@ -514,12 +600,14 @@ class StreamContent extends StatefulWidget {
   final Color backgroundStyleColor;
   final ScrollController scrollController;
   final Chapter chapter;
+  final AnimationController animationController;
 
   StreamContent({
     this.detailChapterBloc,
     this.id,
     this.sizeText,
     this.chapter,
+    this.animationController,
     this.fontStyle,
     this.textColor,
     this.backgroundStyleColor,
@@ -568,32 +656,42 @@ class _StreamContentState extends State<StreamContent> {
             );
           }
 
-          return SingleChildScrollView(
-            controller: widget.scrollController,
-            child: Container(
-              color: widget.backgroundStyleColor,
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    '${widget.chapter.nameIdChapter}: ${widget.chapter.contentTitleOfChapter}',
-                    style: GoogleFonts.getFont(
-                      widget.fontStyle,
-                      fontSize: widget.sizeText + 7,
-                      color: widget.textColor,
+          return NotificationListener<ScrollNotification>(
+            onNotification: (scrollNotification) {
+              if (scrollNotification is ScrollStartNotification) {
+                if (!widget.animationController.isCompleted) {
+                  widget.animationController.forward();
+                }
+              }
+              return true;
+            },
+            child: SingleChildScrollView(
+              controller: widget.scrollController,
+              child: Container(
+                color: widget.backgroundStyleColor,
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      '${widget.chapter.nameIdChapter}: ${widget.chapter.contentTitleOfChapter}',
+                      style: GoogleFonts.getFont(
+                        widget.fontStyle,
+                        fontSize: widget.sizeText + 7,
+                        color: widget.textColor,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    content,
-                    style: GoogleFonts.getFont(
-                      widget.fontStyle,
-                      fontSize: widget.sizeText,
-                      color: widget.textColor,
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                ],
+                    Text(
+                      content,
+                      style: GoogleFonts.getFont(
+                        widget.fontStyle,
+                        fontSize: widget.sizeText,
+                        color: widget.textColor,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

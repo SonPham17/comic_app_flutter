@@ -138,32 +138,30 @@ class _ExtensionListWidgetState extends State<ExtensionListWidget> {
           SizedBox(
             height: 25,
           ),
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              children: <Widget>[
-                ExtensionListItem(
-                  iconData: LineAwesomeIcons.star,
-                  text: 'Đánh giá ứng dụng',
-                  onPressed: clickRate,
-                ),
-                ExtensionListItem(
-                  iconData: LineAwesomeIcons.share_alt,
-                  text: 'Chia sẻ với bạn bè',
-                  onPressed: share,
-                ),
-                ExtensionListItem(
-                  iconData: LineAwesomeIcons.comment,
-                  text: 'Phản hồi góp ý',
-                  onPressed: feedback,
-                ),
-                ExtensionListItem(
-                  iconData: LineAwesomeIcons.user,
-                  text: 'Đăng nhập',
-                ),
-              ],
-            ),
+          ListView(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            children: <Widget>[
+              ExtensionListItem(
+                iconData: Icons.star,
+                text: 'Đánh giá ứng dụng',
+                onPressed: clickRate,
+              ),
+              ExtensionListItem(
+                iconData: Icons.share,
+                text: 'Chia sẻ với bạn bè',
+                onPressed: share,
+              ),
+              ExtensionListItem(
+                iconData: Icons.comment,
+                text: 'Phản hồi góp ý',
+                onPressed: feedback,
+              ),
+              ExtensionListItem(
+                iconData: Icons.supervised_user_circle,
+                text: 'Đăng nhập',
+              ),
+            ],
           )
         ],
       ),
@@ -189,7 +187,7 @@ class ExtensionListItem extends StatelessWidget {
       ).copyWith(bottom: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        color: Theme.of(context).backgroundColor,
+        color: Colors.black38,
       ),
       padding: EdgeInsets.symmetric(
         horizontal: 15,
@@ -209,7 +207,7 @@ class ExtensionListItem extends StatelessWidget {
             ),
             Spacer(),
             Icon(
-              LineAwesomeIcons.angle_right,
+              Icons.chevron_right,
               size: 28,
             ),
           ],
