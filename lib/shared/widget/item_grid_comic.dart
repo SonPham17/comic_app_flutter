@@ -29,11 +29,12 @@ class ItemGridComic extends StatelessWidget {
               GestureDetector(
                 onTap: openContainer,
                 child: FadeInImage.assetNetwork(
-                  height: 150,
+                  height: 160,
                   placeholder: 'assets/images/main_icon.png',
                   image:
                       'https://www.nae.vn/ttv/ttv/public/images/story/${comic.image}.jpg',
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
+                  width: double.infinity,
                 ),
               ),
               SizedBox(
