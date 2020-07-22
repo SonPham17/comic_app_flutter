@@ -42,13 +42,14 @@ class ItemGridComic extends StatelessWidget {
               ),
               Expanded(
                 child: Center(
-                    child: Text(
-                  comic.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TvStyle.fontAppWithSize(12),
-                  textAlign: TextAlign.center,
-                )),
+                  child: Text(
+                    comic.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TvStyle.fontAppWithSize(12),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               )
             ],
           ),
